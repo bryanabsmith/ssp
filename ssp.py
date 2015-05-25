@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import ConfigParser
 import signal
 import SimpleHTTPServer
 import SocketServer
@@ -27,6 +28,12 @@ class sspserver():
 		"""
 			Constructor for main server class.
 		"""
+		
+		self.config = ConfigParser.RawConfigParser(allow_no_value=True)
+		self.config.read("config.ssp")
+		
+		PORT = int(self.config.get("setup", "port"))
+		
 		try:
 			Handler = SSPHTTPHandler
 			httpd = SocketServer.TCPServer(("", PORT), Handler)
