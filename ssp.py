@@ -1,13 +1,16 @@
 #!/usr/bin/python
 
+import BaseHTTPServer
 import ConfigParser
+import os
 import signal
 import SimpleHTTPServer
 import SocketServer
 import sys
 
 PORT = 8888
-SSP_VERSION = "ssp/"
+SSP_VERSION = ""
+DOCROOT = "."
 
 # http://stackoverflow.com/a/25375077
 class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
@@ -23,6 +26,30 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 		# Print log message per request to the web server
 		print("[%s]: %s ==> %s" % (self.log_date_time_string(), self.client_address[0], format%args))
 		print(args[1])
+	
+	# https://wiki.python.org/moin/BaseHttpServer
+	def do_HEAD(self):
+		self.send_response(200)
+		self.send_header("Content-type", "text/html")
+		self.end_headers()
+		
+	# https://wiki.python.org/moin/BaseHttpServer
+	def do_GET(self):
+		self.send_response(200)
+		self.send_header("Content-type", "text/html")
+		self.end_headers()
+		
+		if os.path.isfile("index.html") == False & os.path.isfile("index.htm") == False:
+				self.wfile.write("Hello")
+		elif os.path.isfile("index.html") == True:
+			f = open("index.html", "r")
+			self.wfile.write(f.read())
+			f.close()
+		elif os.path.isfile("index.htm") == True:
+			f = open("index.htm", "r")
+			self.wfile.write(f.read())
+			f.close()
+			
 
 class sspserver():
 	
@@ -35,12 +62,24 @@ class sspserver():
 		self.config.read("config.ssp")
 		
 		PORT = int(self.config.get("setup", "port"))
-		SSP_VERSION += self.config.get("setup", "ssp_version")
+		SSP_VERSION = "ssp/" + self.config.get("setup", "ssp_version")
+		DOCROOT = self.config.get("setup", "docroot")
+		
+		os.chdir(DOCROOT)
 		
 		try:
 			Handler = SSPHTTPHandler
 			httpd = SocketServer.TCPServer(("", PORT), Handler)
-			print "Serving on port " + str(PORT)
+			
+			print(SSP_VERSION)
+			print("Serving on port " + str(PORT))
+			
+			if DOCROOT == ".":
+				print("Serving out of the current working directory")
+			else:
+				print("Serving out of " + DOCROOT)
+				
+			
 			httpd.serve_forever()
 		except KeyboardInterrupt:
 			sys.exit(0)
