@@ -35,7 +35,7 @@ class sspserver():
 		self.config.read("config.ssp")
 		
 		PORT = int(self.config.get("setup", "port"))
-		SSP_VERSION = self.config.get("setup", "ssp_version")
+		SSP_VERSION += self.config.get("setup", "ssp_version")
 		
 		try:
 			Handler = SSPHTTPHandler
