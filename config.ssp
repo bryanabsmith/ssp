@@ -1,3 +1,4 @@
 [setup]
 
 port=8887
+ssp_version=0.1
