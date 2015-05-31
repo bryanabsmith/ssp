@@ -5,23 +5,50 @@
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
 		<link href='http://fonts.googleapis.com/css?family=Fira+Sans:300' rel='stylesheet' type='text/css'>
+		<!--<link href='http://fonts.googleapis.com/css?family=Syncopate' rel='stylesheet' type='text/css'>-->
 		<style>
 			
 			body {
-				background-color: #eee;
-				font-family: 'Fira Sans', sans-serif;
-				font-size: 18pt;
+				background-color: #eee; /* http://getbootstrap.com/examples/signin/ */
 				padding: 5%;
+				font-family: 'Fira Sans', sans-serif;
+			}
+			
+			#pWorks {
+				display: none;
+				font-size: 18pt;
+			}
+			
+			#pPowered {
+				display: none;
+				/*font-family: 'Syncopate', sans-serif;*/
+				font-size: 14pt;
 			}
 			
 		</style>
 		
 		<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+			
+		<script>
+			
+			$(document).ready(function() {
+				$("#pWorks").fadeIn({
+					duration: 1000
+				});
+				
+				$("#pPowered").fadeIn({
+					duration: 2000
+				});
+			});
+			
+		</script>
 	</head>
 	
 	<body>
-		<p class="text-center">It works!</p>
+		<p id="pWorks" class="text-center">It works!</p>
+		<p></p>
+		<p id="pPowered" class="text-center">Powered by SSP</p></p>
 	</body>
 	
 </html>

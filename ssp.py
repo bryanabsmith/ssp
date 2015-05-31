@@ -40,7 +40,9 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 		self.end_headers()
 		
 		if os.path.isfile("index.html") == False & os.path.isfile("index.htm") == False:
-				self.wfile.write("Hello")
+			f = open("index.html", "r") # Change to the location that the "it works!" page is located.
+			self.wfile.write(f.read())
+			f.close()
 		elif os.path.isfile("index.html") == True:
 			f = open("index.html", "r")
 			self.wfile.write(f.read())

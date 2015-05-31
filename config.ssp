@@ -1,5 +1,5 @@
 [setup]
 
-port=8887
+port=8888
 ssp_version=0.1
-docroot=.
+docroot=/
