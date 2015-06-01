@@ -11,6 +11,7 @@ import sys
 PORT = 8888
 SSP_VERSION = "0.1"
 DOCROOT = "."
+ITWORKS = "dwcwc"
 
 # http://stackoverflow.com/a/25375077
 class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
@@ -29,20 +30,36 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 	
 	# https://wiki.python.org/moin/BaseHttpServer
 	def do_HEAD(self):
+		# Send a 200 (OK) - request succeeded.
 		self.send_response(200)
+		
+		# Set the content to html.
 		self.send_header("Content-type", "text/html")
+		
+		# End the headers.
 		self.end_headers()
 		
 	# https://wiki.python.org/moin/BaseHttpServer
 	def do_GET(self):
-		#self.send_response(200)
-		#self.send_header("Content-type", "text/html")
-		#self.end_headers()
+		# self.send_response(200)
+		# self.send_header("Content-type", "text/html")
+		# self.end_headers()
 		
+		# Setup the configuration parser.
+		config = ConfigParser.RawConfigParser(allow_no_value=True)
+		
+		# Load the configuration file. 
+		config.read("ssp.config")
+		
+		# "It Works" page.
+		itworks = config.get("content", "itworks")
+		
+		# Create the headers.
 		self.do_HEAD()
 		
+		# Check to see if an index.html or index.htm already exists.
 		if os.path.isfile("index.html") == False & os.path.isfile("index.htm") == False:
-			f = open("index.html", "r") # Change to the location that the "it works!" page is located.
+			f = open(itworks, "r")
 			self.wfile.write(f.read())
 			f.close()
 		elif os.path.isfile("index.html") == True:
@@ -62,30 +79,51 @@ class sspserver():
 			Constructor for main server class.
 		"""
 		
+		# Setup the configuration parser.
 		self.config = ConfigParser.RawConfigParser(allow_no_value=True)
+		
+		# Load the configuration file. 
 		self.config.read("ssp.config")
 		
+		# Set the port based on the config file.
 		PORT = int(self.config.get("setup", "port"))
-		#SSP_VERSION = "ssp/" + self.config.get("setup", "ssp_version")
-		DOCROOT = self.config.get("setup", "docroot")
 		
+		# Set the version based on the config file.
+		# SSP_VERSION = "ssp/" + self.config.get("setup", "ssp_version")
+		
+		# Set the docroot based on the config file.
+		DOCROOT = self.config.get("content", "docroot")
+		
+		# Set the location of the "It Works" page (the default index.html page).
+		# ITWORKS = self.config.get("content", "itworks")
+		
+		# Change the working directory to the one specified for the docroot. This ensures that we are serving content out of the docroot directory.
 		os.chdir(DOCROOT)
 		
 		try:
+			# Set up the http handler. This does the "grunt" work. The more fine grained details are handled in the SSPHTTPHandler class. 
 			Handler = SSPHTTPHandler
+			
+			# This creates a tcp server.
 			httpd = SocketServer.TCPServer(("", PORT), Handler)
 			
+			# Print the version of ssp. 
 			print("=> ssp/" + SSP_VERSION)
+			
+			# Print the port that the server will pipe content through.
 			print("==> Serving on port " + str(PORT))
 			
+			# If the document root config option is set to ., serve content out of the current working directory.
 			if DOCROOT == ".":
 				print("==> Serving out of " + os.getcwd())
 			else:
 				print("==> Serving out of " + DOCROOT)
 				
-			
+			# Serve content "forever" until a KeyBoardInterrupt is issued (Control-C).
 			httpd.serve_forever()
 		except KeyboardInterrupt:
+			
+			# If Control-C is pressed, kill the server.
 			sys.exit(0)
 	
 if __name__ == "__main__":
