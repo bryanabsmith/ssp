@@ -9,7 +9,7 @@ import SocketServer
 import sys
 
 PORT = 8888
-SSP_VERSION = ""
+SSP_VERSION = "0.1"
 DOCROOT = "."
 
 # http://stackoverflow.com/a/25375077
@@ -35,9 +35,11 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 		
 	# https://wiki.python.org/moin/BaseHttpServer
 	def do_GET(self):
-		self.send_response(200)
-		self.send_header("Content-type", "text/html")
-		self.end_headers()
+		#self.send_response(200)
+		#self.send_header("Content-type", "text/html")
+		#self.end_headers()
+		
+		self.do_HEAD()
 		
 		if os.path.isfile("index.html") == False & os.path.isfile("index.htm") == False:
 			f = open("index.html", "r") # Change to the location that the "it works!" page is located.
@@ -61,10 +63,10 @@ class sspserver():
 		"""
 		
 		self.config = ConfigParser.RawConfigParser(allow_no_value=True)
-		self.config.read("config.ssp")
+		self.config.read("ssp.config")
 		
 		PORT = int(self.config.get("setup", "port"))
-		SSP_VERSION = "ssp/" + self.config.get("setup", "ssp_version")
+		#SSP_VERSION = "ssp/" + self.config.get("setup", "ssp_version")
 		DOCROOT = self.config.get("setup", "docroot")
 		
 		os.chdir(DOCROOT)
@@ -73,13 +75,13 @@ class sspserver():
 			Handler = SSPHTTPHandler
 			httpd = SocketServer.TCPServer(("", PORT), Handler)
 			
-			print(SSP_VERSION)
-			print("Serving on port " + str(PORT))
+			print("=> ssp/" + SSP_VERSION)
+			print("==> Serving on port " + str(PORT))
 			
 			if DOCROOT == ".":
-				print("Serving out of the current working directory")
+				print("==> Serving out of " + os.getcwd())
 			else:
-				print("Serving out of " + DOCROOT)
+				print("==> Serving out of " + DOCROOT)
 				
 			
 			httpd.serve_forever()
