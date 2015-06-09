@@ -2,6 +2,7 @@
 
 import BaseHTTPServer
 import ConfigParser
+import logging
 import os
 import signal
 import SimpleHTTPServer
@@ -11,7 +12,34 @@ import sys
 PORT = 8888
 SSP_VERSION = "0.1"
 DOCROOT = "."
-ITWORKS = "/html/index.html"
+ITWORKS = "html/index.html"
+LOGFILE = "ssp.log"
+
+WORKSPAGE = """<!DOCTYPE html5>
+<html>
+	<head>
+		<style>
+			body {
+				background-color: #eee;
+				font-family: 'Verdana', Geneva, sans-serif;
+				margin: 10%;
+			}
+			
+			.subtext {
+				color: #B0B0B0;
+				padding-left: 5em;
+			}
+		</style>
+	</head>
+	<body>
+		<h3>It works!</h3>
+		<p></p>
+		<span class='subtext'>SSP version: &version&</span>
+		<p></p>
+		<span class='subtext'>To get started, place an index file (index.html) into your docroot.</span>
+	</body>
+</html>
+"""
 
 # http://stackoverflow.com/a/25375077
 class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
@@ -37,7 +65,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 			# 200 is OK - this is what we're looking for.
 			if code == "200":
 				code = "OK (200)"
-			print("%s on %s" % (code, self.log_date_time_string()))
+			print("[%s]: %s" % (self.log_date_time_string(), code))
 	
 	# https://wiki.python.org/moin/BaseHttpServer
 	def do_HEAD(self):
@@ -65,20 +93,20 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 		# Create the headers.
 		self.do_HEAD()
 		
+		# Log that headers were sent
+		logging.info("headers")
+		
 		# Check to see if an index.html or index.htm already exists. If it doesn't, use one set by the user in the config file.
-		if os.path.isfile("index.html") == False & os.path.isfile("index.htm") == False:
+		if os.path.isfile("index.html") == False:
 			# This loads the default index file that the user configures.
-			f = open(itworks, "r")
-			self.wfile.write(f.read())
-			f.close()
+			#f = open(itworks, "r")
+			#self.wfile.write(f.read())
+			#f.close()
+			default_page = WORKSPAGE.replace("&version&", SSP_VERSION)
+			self.wfile.write(default_page)
 		# If there is an index.html available, use that.
 		elif os.path.isfile("index.html") == True:
 			f = open("index.html", "r")
-			self.wfile.write(f.read())
-			f.close()
-		# If there is an index.htm available, use that.
-		elif os.path.isfile("index.htm") == True:
-			f = open("index.htm", "r")
 			self.wfile.write(f.read())
 			f.close()
 			
@@ -95,6 +123,16 @@ class sspserver():
 		
 		# Load the configuration file. 
 		self.config.read("ssp.config")
+		
+		# Set the log file.
+		LOGFILE = self.config.get("setup", "logfile")
+		
+		# Setup the logger.
+		# http://stackoverflow.com/q/11581794 - formatting help
+		self.logger = logging.basicConfig(filename=LOGFILE, level=logging.DEBUG, format="[%(asctime)s]: %(levelname)s: %(message)s")
+		
+		# Log that things got started 
+		logging.info("ssp started.")
 		
 		# Set the port based on the config file.
 		PORT = int(self.config.get("setup", "port"))
