@@ -144,6 +144,7 @@ class sspserver():
 		DOCROOT = self.config.get("content", "docroot")
 		
 		# Set the location of the "It Works" page (the default index.html page).
+		# This is now written into the server itself for the purposes of simplfying things.
 		# ITWORKS = self.config.get("content", "itworks")
 		
 		# Change the working directory to the one specified for the docroot. This ensures that we are serving content out of the docroot directory.

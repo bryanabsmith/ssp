@@ -12,7 +12,11 @@ This project is not designed to be used in any sort of production environment. A
 
 ### Milestone 1:
 * Intended release date: June 15th
-* Goal: to have a functioning (however limited) server that forms the foundation for further work. At this point, the code should serve content, be configurable and log requests. None of this is particularly hard with Python but I think it's important to have a goal for an initial milestone release.
+* Goal: To have a functioning (however limited) server that forms the foundation for further work. At this point, the code should serve content, be configurable and log requests. None of this is particularly hard with Python but I think it's important to have a goal for an initial milestone release.
+
+### Milestone 2:
+* Intended date: June 30th
+* Goal: To have a testing suite in place and have a server that can log and manage some moderate amount of stress.
 
 ### Future Milestones: TBD.
 
@@ -20,9 +24,3 @@ This project is not designed to be used in any sort of production environment. A
 
 ### SSP
 Licenced under the MIT Licence. (c) 2015 Bryan Smith.
-
-### Bootstrap
-Licence under the MIT Licence. (c) Twitter.
-
-### jQuery
-Licence under the MIT Licence. (c) jQuery Foundation and other contributors.
