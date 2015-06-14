@@ -7,6 +7,7 @@ import os
 import signal
 import SimpleHTTPServer
 import SocketServer
+import socket
 import string
 import sys
 
@@ -15,6 +16,7 @@ SSP_VERSION = "0.1"
 DOCROOT = "."
 ITWORKS = "html/index.html"
 LOGFILE = "ssp.log"
+IP = "0.0.0.0"
 
 WORKSPAGE = """<!DOCTYPE html5>
 <html>
@@ -151,6 +153,14 @@ class sspserver():
 		# Change the working directory to the one specified for the docroot. This ensures that we are serving content out of the docroot directory.
 		os.chdir(DOCROOT)
 		
+		usehost = self.config.get("setup", "usehostname")
+		
+		# Thank to http://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib for the IP tips.
+		if usehost == False:
+			IP = socket.gethostbyname(socket.getfqdn())
+		else:
+			IP = socket.gethostbyname(socket.gethostname())
+		
 		try:
 			# Set up the http handler. This does the "grunt" work. The more fine grained details are handled in the SSPHTTPHandler class. 
 			Handler = SSPHTTPHandler
@@ -159,16 +169,21 @@ class sspserver():
 			httpd = SocketServer.TCPServer(("", PORT), Handler)
 			
 			# Print the version of ssp. 
-			print(string.center("=> ssp/" + SSP_VERSION, 20))
+			print("=> ssp/" + SSP_VERSION)
 			
 			# Print the port that the server will pipe content through.
-			print(string.center("==> Serving on port " + str(PORT), 30))
+			print("	==> Serving on port " + str(PORT))
+			
+			# Print the IP address of the server.
+			print("	==> Serving on IP " + str(IP))
 			
 			# If the document root config option is set to ., serve content out of the current working directory.
 			if DOCROOT == ".":
-				print("==> Serving out of " + os.getcwd())
+				print("	==> Serving out of " + os.getcwd())
 			else:
-				print(string.center("==> Serving out of " + DOCROOT, 30))
+				print("	==> Serving out of " + DOCROOT)
+				
+			print("\nLog:")
 				
 			# Serve content "forever" until a KeyBoardInterrupt is issued (Control-C).
 			httpd.serve_forever()
