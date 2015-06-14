@@ -7,6 +7,7 @@ import os
 import signal
 import SimpleHTTPServer
 import SocketServer
+import string
 import sys
 
 PORT = 8888
@@ -158,16 +159,16 @@ class sspserver():
 			httpd = SocketServer.TCPServer(("", PORT), Handler)
 			
 			# Print the version of ssp. 
-			print("=> ssp/" + SSP_VERSION)
+			print(string.center("=> ssp/" + SSP_VERSION, 20))
 			
 			# Print the port that the server will pipe content through.
-			print("==> Serving on port " + str(PORT))
+			print(string.center("==> Serving on port " + str(PORT), 30))
 			
 			# If the document root config option is set to ., serve content out of the current working directory.
 			if DOCROOT == ".":
 				print("==> Serving out of " + os.getcwd())
 			else:
-				print("==> Serving out of " + DOCROOT)
+				print(string.center("==> Serving out of " + DOCROOT, 30))
 				
 			# Serve content "forever" until a KeyBoardInterrupt is issued (Control-C).
 			httpd.serve_forever()
