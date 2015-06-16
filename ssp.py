@@ -18,6 +18,7 @@ ITWORKS = "html/index.html"
 LOGFILE = "ssp.log"
 IP = "0.0.0.0"
 
+# This is the default page for "it works!" (ie. the server is successfully loading content). &version& is replaced with the current version of ssp running. 
 WORKSPAGE = """<!DOCTYPE html5>
 <html>
 	<head>
