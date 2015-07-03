@@ -18,7 +18,7 @@ ITWORKS = "html/index.html"
 LOGFILE = "ssp.log"
 IP = "0.0.0.0"
 
-# This is the default page for "it works!" (ie. the server is successfully loading content). &version& is replaced with the current version of ssp running. 
+# This is the default page for "it works!" (ie. the server is successfully loading content). &version& is replaced with the current version of ssp running.
 WORKSPAGE = """<!DOCTYPE html5>
 <html>
 	<head>
@@ -28,7 +28,7 @@ WORKSPAGE = """<!DOCTYPE html5>
 				font-family: 'Verdana', Geneva, sans-serif;
 				margin: 10%;
 			}
-			
+
 			.subtext {
 				color: #B0B0B0;
 				padding-left: 5em;
@@ -50,7 +50,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
 	# Set the server version
 	SimpleHTTPServer.SimpleHTTPRequestHandler.server_version = SSP_VERSION
-	
+
 	# ConfigParser for the Handler class
 	config = ConfigParser.RawConfigParser(allow_no_value=True)
 
@@ -70,36 +70,36 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 			if code == "200":
 				code = "OK (200)"
 			print("[%s]: %s" % (self.log_date_time_string(), code))
-	
+
 	# https://wiki.python.org/moin/BaseHttpServer
 	def do_HEAD(self):
 		# Send a 200 (OK) - request succeeded.
 		self.send_response(200)
-		
+
 		# Set the content to html.
 		self.send_header("Content-type", "text/html")
-		
+
 		# End the headers.
 		self.end_headers()
-		
+
 	# https://wiki.python.org/moin/BaseHttpServer
 	def do_GET(self):
 		# self.send_response(200)
 		# self.send_header("Content-type", "text/html")
 		# self.end_headers()
-		
-		# Load the configuration file. 
+
+		# Load the configuration file.
 		self.config.read("ssp.config")
-		
+
 		# "It Works" page.
 		itworks = self.config.get("content", "itworks")
-		
+
 		# Create the headers.
 		self.do_HEAD()
-		
+
 		# Log that headers were sent
 		logging.info("headers")
-		
+
 		# Check to see if an index.html or index.htm already exists. If it doesn't, use one set by the user in the config file.
 		if os.path.isfile("index.html") == False:
 			# This loads the default index file that the user configures.
@@ -113,85 +113,85 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 			f = open("index.html", "r")
 			self.wfile.write(f.read())
 			f.close()
-			
+
 
 class sspserver():
-	
+
 	def __init__(self):
 		"""
 			Constructor for main server class.
 		"""
-		
+
 		# Setup the configuration parser.
 		self.config = ConfigParser.RawConfigParser(allow_no_value=True)
-		
-		# Load the configuration file. 
+
+		# Load the configuration file.
 		self.config.read("ssp.config")
-		
+
 		# Set the log file.
 		LOGFILE = self.config.get("setup", "logfile")
-		
+
 		# Setup the logger.
 		# http://stackoverflow.com/q/11581794 - formatting help
 		self.logger = logging.basicConfig(filename=LOGFILE, level=logging.DEBUG, format="[%(asctime)s]: %(levelname)s: %(message)s")
-		
-		# Log that things got started 
+
+		# Log that things got started
 		logging.info("ssp started.")
-		
+
 		# Set the port based on the config file.
 		PORT = int(self.config.get("setup", "port"))
-		
+
 		# Set the version based on the config file.
 		# SSP_VERSION = "ssp/" + self.config.get("setup", "ssp_version")
-		
+
 		# Set the docroot based on the config file.
 		DOCROOT = self.config.get("content", "docroot")
-		
+
 		# Set the location of the "It Works" page (the default index.html page).
 		# This is now written into the server itself for the purposes of simplfying things.
 		# ITWORKS = self.config.get("content", "itworks")
-		
+
 		# Change the working directory to the one specified for the docroot. This ensures that we are serving content out of the docroot directory.
 		os.chdir(DOCROOT)
-		
+
 		usehost = self.config.get("setup", "usehostname")
-		
+
 		# Thank to http://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib for the IP tips.
 		if usehost == False:
 			IP = socket.gethostbyname(socket.getfqdn())
 		else:
 			IP = socket.gethostbyname(socket.gethostname())
-		
+
 		try:
-			# Set up the http handler. This does the "grunt" work. The more fine grained details are handled in the SSPHTTPHandler class. 
+			# Set up the http handler. This does the "grunt" work. The more fine grained details are handled in the SSPHTTPHandler class.
 			Handler = SSPHTTPHandler
-			
-			# This creates a tcp server using the Handler. As I understand it, this creates a standard TCP server and then handles connections to it using the SSPHTTPHandler class. 
+
+			# This creates a tcp server using the Handler. As I understand it, this creates a standard TCP server and then handles connections to it using the SSPHTTPHandler class.
 			httpd = SocketServer.TCPServer(("", PORT), Handler)
-			
-			# Print the version of ssp. 
+
+			# Print the version of ssp.
 			print("=> ssp/" + SSP_VERSION)
-			
+
 			# Print the port that the server will pipe content through.
 			print("	==> Serving on port " + str(PORT))
-			
+
 			# Print the IP address of the server.
 			print("	==> Serving on IP " + str(IP))
-			
+
 			# If the document root config option is set to ., serve content out of the current working directory.
 			if DOCROOT == ".":
 				print("	==> Serving out of " + os.getcwd())
 			else:
 				print("	==> Serving out of " + DOCROOT)
-				
+
 			print("\nLog:")
-				
+
 			# Serve content "forever" until a KeyBoardInterrupt is issued (Control-C).
 			httpd.serve_forever()
 		except KeyboardInterrupt:
-			
+
 			# If Control-C is pressed, kill the server.
 			sys.exit(0)
-	
+
 if __name__ == "__main__":
 	s = sspserver()
