@@ -1,14 +1,14 @@
 #!/usr/bin/python
 
+# When testing, "sudo lsof -i :<port> and sudo kill -9 <PID>" will close the port if you find Python complaining that a port is in use. Courtesy of http://stackoverflow.com/questions/12397175/how-do-i-close-an-open-port-from-the-terminal-on-the-mac
+
 import BaseHTTPServer
 import ConfigParser
 import logging
 import os
-import signal
 import SimpleHTTPServer
 import SocketServer
 import socket
-import string
 import sys
 
 PORT = 8888
@@ -17,6 +17,7 @@ DOCROOT = "."
 ITWORKS = "html/index.html"
 LOGFILE = "ssp.log"
 IP = "0.0.0.0"
+PLAT = sys.platform
 
 # This is the default page for "it works!" (ie. the server is successfully loading content). &version& is replaced with the current version of ssp running.
 WORKSPAGE = """<!DOCTYPE html5>
@@ -68,7 +69,11 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 			code = args[1]
 			# 200 is OK - this is what we're looking for.
 
-			httpCodes = {"100": "Continue", "101": "Switching Protocols", "200": "OK", "201": "Created", "202": "Accepted", "203": "Non-Authoritative Information", "204": "No Content", "205": "Reset Content", "206": "Partial Content", "300": "Multiple Choices", "301": "Moved Permanently", "302": "Found", "303": "See Other", "304": "Not Modified", "305": "Use Proxy", "307": "Temporary Redirect", "400": "Bad Request", "401": "Unauthorized", "402": "Payment Required", "403": "Forbidden", "404": "Not Found", "405": "Method Not Allowed", "406": "Not Acceptable", "407": "Proxy Authentication Required", "408": "Request Timeout", "409": "Conflict", "410": "Gone", "411": "Length Required", "412": "Precondition Failed", "413": "Request Entity Too Large", "414": "Request-URI Too Long", "415": "Unsupported Media Type", "416": "Requested Range Not Satisfiable", "417": "Expectation Failed", "500": "Internal Server Error", "501": "Not Implemented", "502": "Bad Gateway", "503": "Service Unavailable", "504": "Gateway Timeout", "505": "HTTP Version Not Supported"}
+			httpCodes = {"100": "Continue", "101": "Switching Protocols",
+						 "200": "OK", "201": "Created", "202": "Accepted", "203": "Non-Authoritative Information", "204": "No Content", "205": "Reset Content", "206": "Partial Content",
+						 "300": "Multiple Choices", "301": "Moved Permanently", "302": "Found", "303": "See Other", "304": "Not Modified", "305": "Use Proxy", "307": "Temporary Redirect",
+						 "400": "Bad Request", "401": "Unauthorized", "402": "Payment Required", "403": "Forbidden", "404": "Not Found", "405": "Method Not Allowed", "406": "Not Acceptable", "407": "Proxy Authentication Required", "408": "Request Timeout", "409": "Conflict", "410": "Gone", "411": "Length Required", "412": "Precondition Failed", "413": "Request Entity Too Large", "414": "Request-URI Too Long", "415": "Unsupported Media Type", "416": "Requested Range Not Satisfiable", "417": "Expectation Failed",
+						 "500": "Internal Server Error", "501": "Not Implemented", "502": "Bad Gateway", "503": "Service Unavailable", "504": "Gateway Timeout", "505": "HTTP Version Not Supported"}
 
 			#if code == "200":
 				#code = "OK (200)"
@@ -128,8 +133,18 @@ class sspserver():
 		# Setup the configuration parser.
 		self.config = ConfigParser.RawConfigParser(allow_no_value=True)
 
-		# Load the configuration file.
-		self.config.read("ssp.config")
+        # OS X config location
+		if (PLAT == "darwin"):
+			self.config.read("ssp.config")
+        # Windows config location
+		elif (PLAT == "win32"):
+			self.config.read("ssp.config")
+        # Linux config location
+		elif (PLAT.find("linux") > -1):
+			self.config.read("ssp.config")
+        # Everything else config location
+		else:
+			self.config.read("ssp.config")
 
 		# Set the log file.
 		LOGFILE = self.config.get("setup", "logfile")
@@ -151,7 +166,7 @@ class sspserver():
 		DOCROOT = self.config.get("content", "docroot")
 
 		# Set the location of the "It Works" page (the default index.html page).
-		# This is now written into the server itself for the purposes of simplfying things.
+		# This is now written into the server itself for the purposes of simplifying things.
 		# ITWORKS = self.config.get("content", "itworks")
 
 		# Change the working directory to the one specified for the docroot. This ensures that we are serving content out of the docroot directory.
@@ -173,7 +188,7 @@ class sspserver():
 			httpd = SocketServer.TCPServer(("", PORT), Handler)
 
 			# Print the version of ssp.
-			print("=> ssp/" + SSP_VERSION)
+			print("=> ssp/" + SSP_VERSION + " running on " + PLAT)
 
 			# Print the port that the server will pipe content through.
 			print("	==> Serving on port " + str(PORT))
