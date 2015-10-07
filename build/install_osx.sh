@@ -5,7 +5,7 @@ VERSION=0.1
 # http://www.cyberciti.biz/tips/shell-root-user-check-script.html
 if [ "$(id -u)" == "0" ]; then
   echo ":: Downloading ssp..."
-  curl -O http://www.bryanabsmith.com/ssp/ssp_$VERSION.tar.gz > /dev/null
+  curl -O http://www.bryanabsmith.com/ssp/ssp_osx_$VERSION.tar.gz > /dev/null
   echo ":: Unpacking ssp package..."
   tar zxvf ssp_$VERSION.tar.gz > /dev/null
   echo ":: Moving ssp files..."
