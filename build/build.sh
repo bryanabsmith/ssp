@@ -6,3 +6,8 @@ echo ":: Building ssp..."
 cxfreeze ../ssp.py --target-dir ../ssp_$VERSION > /dev/null
 echo ":: Copying configuration file..."
 cp ../ssp.config ../ssp_$VERSION/ > /dev/null
+echo ":: Creating archive..."
+# http://www.tecmint.com/18-tar-command-examples-in-linux/
+tar -cvzf ../ssp_$VERSION.tar.gz ../ssp_$VERSION/ > /dev/null
+echo ":: Removing build files..."
+rm -rf ../ssp_$VERSION/
