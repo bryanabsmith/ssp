@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 # When testing, "sudo lsof -i :<port> and sudo kill -9 <PID>" will close the port if you find Python complaining that a port is in use. Courtesy of http://stackoverflow.com/questions/12397175/how-do-i-close-an-open-port-from-the-terminal-on-the-mac
+# If you're testing with the default port of 8888, execute the following to address ""[Errno 48] Address already in use" issues:
+#	sudo lsof -i :8888 and sudo kill -9 <PID>
 
 import BaseHTTPServer
 import ConfigParser
@@ -30,20 +32,46 @@ WORKSPAGE = """<!DOCTYPE html5>
 				margin: 10%;
 			}
 
-			.subtext {
-				color: #B0B0B0;
-				padding-left: 5em;
+			table {
+				border-spacing: 0px;
+				border-style: solid;
+				border-width: 1px;
+			}
+
+			th {
+				background-color: #606060;
+				color: white;
+			}
+
+			th, td {
+				padding: 5px;
+			}
+
+			.evenRow {
+				background-color: #C0C0C0 ;
 			}
 		</style>
 	</head>
 	<body>
 		<h3>It works!</h3>
-		<p></p>
-		<span class='subtext'>SSP version: &version&</span>
-		<p></p>
-		<span class='subtext'>To get started, place an index file (index.html) into your docroot.</span>
+
+		<table>
+			<tr>
+				<th>Property</th>
+				<th>Value</th>
+			</tr>
+			<tr>
+				<td>Version</td>
+				<td>&version&</td>
+			</tr>
+			<tr class="evenRow">
+				<td>Docroot</td>
+				<td>&docroot&</td>
+			</tr>
+		</table>
 	</body>
 </html>
+
 """
 
 # http://stackoverflow.com/a/25375077
@@ -102,6 +130,8 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 		# "It Works" page.
 		itworks = self.config.get("content", "itworks")
 
+		docroot_dir = self.config.get("content", "docroot")
+
 		# Create the headers.
 		self.do_HEAD()
 
@@ -115,6 +145,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 			#self.wfile.write(f.read())
 			#f.close()
 			default_page = WORKSPAGE.replace("&version&", SSP_VERSION)
+			default_page = default_page.replace("&docroot&", docroot_dir)
 			self.wfile.write(default_page)
 		# If there is an index.html available, use that.
 		elif os.path.isfile("index.html") == True:
