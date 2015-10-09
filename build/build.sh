@@ -8,6 +8,6 @@ echo ":: Copying configuration file..."
 cp ../ssp.config ../ssp_$VERSION/ > /dev/null
 echo ":: Creating archive..."
 # http://www.tecmint.com/18-tar-command-examples-in-linux/
-tar -cvzf ../ssp_$VERSION.tar.gz ../ssp_$VERSION/ > /dev/null
+tar -cvjf ../ssp_$VERSION.tar.bz2 ../ssp_$VERSION/ > /dev/null
 echo ":: Removing build files..."
 rm -rf ../ssp_$VERSION/
