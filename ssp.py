@@ -8,6 +8,7 @@ import BaseHTTPServer
 import ConfigParser
 import logging
 import os
+import platform
 import SimpleHTTPServer
 import SocketServer
 import socket
@@ -67,6 +68,10 @@ WORKSPAGE = """<!DOCTYPE html5>
 			<tr class="evenRow">
 				<td>Docroot</td>
 				<td>&docroot&</td>
+			</tr>
+			<tr>
+				<td>Platform</td>
+				<td>&platform&</td>
 			</tr>
 		</table>
 	</body>
@@ -132,6 +137,14 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
 		docroot_dir = self.config.get("content", "docroot")
 
+		platformName = platform.system()
+		if platformName == "Darwin":
+			platformName = "OS X %s" % platform.mac_ver()[0]
+		elif platformName == "Windows":
+			platformName = "Windows %s" % platform.win32_ver()[0]
+		elif platformName == "Linux":
+			platformName = "%s (%s)" % (platform.linux_distribution()[0], platform.release())
+
 		# Create the headers.
 		self.do_HEAD()
 
@@ -146,6 +159,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 			#f.close()
 			default_page = WORKSPAGE.replace("&version&", SSP_VERSION)
 			default_page = default_page.replace("&docroot&", docroot_dir)
+			default_page = default_page.replace("&platform&", platformName)
 			self.wfile.write(default_page)
 		# If there is an index.html available, use that.
 		elif os.path.isfile("index.html") == True:
