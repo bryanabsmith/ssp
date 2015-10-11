@@ -6,6 +6,7 @@
 
 import BaseHTTPServer
 import ConfigParser
+import dbm
 import logging
 import os
 import platform
@@ -143,7 +144,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 		elif platformName == "Windows":
 			platformName = "Windows %s" % platform.win32_ver()[0]
 		elif platformName == "Linux":
-			platformName = "%s (%s)" % (platform.linux_distribution()[0], platform.release())
+			platformName = "%s Linux (%s)" % (platform.linux_distribution()[0].capitalize(), platform.release())
 
 		# Create the headers.
 		self.do_HEAD()
@@ -167,6 +168,13 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 			self.wfile.write(f.read())
 			f.close()
 
+		# Open up the stats database.
+		statsDBLocation = self.config.get("stats", "location")
+		statsDB = dbm.open(statsDBLocation, "c")
+		try:
+			statsDB["requests"] = str(int(statsDB["requests"]) + 1)
+		except KeyError:
+			statsDB["requests"] = "1"
 
 class sspserver():
 
@@ -252,7 +260,7 @@ class sspserver():
 			# Serve content "forever" until a KeyBoardInterrupt is issued (Control-C).
 			httpd.serve_forever()
 		except KeyboardInterrupt:
-
+			# self.statsDB.close()
 			# If Control-C is pressed, kill the server.
 			sys.exit(0)
 
