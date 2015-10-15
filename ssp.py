@@ -6,7 +6,8 @@
 
 import BaseHTTPServer
 import ConfigParser
-import dbm
+import datetime
+import anydbm
 import logging
 import os
 import platform
@@ -50,7 +51,7 @@ WORKSPAGE = """<!DOCTYPE html5>
 			}
 
 			.evenRow {
-				background-color: #C0C0C0 ;
+				background-color: #C0C0C0;
 			}
 		</style>
 	</head>
@@ -170,11 +171,21 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
 		# Open up the stats database.
 		statsDBLocation = self.config.get("stats", "location")
-		statsDB = dbm.open(statsDBLocation, "c")
+		statsDB = anydbm.open(statsDBLocation, "c")
+
+		# Add a value to the total requests
 		try:
 			statsDB["requests"] = str(int(statsDB["requests"]) + 1)
 		except KeyError:
 			statsDB["requests"] = "1"
+
+		try:
+			year = datetime.datetime.now().year
+			month = datetime.datetime.now().month
+			day = datetime.datetime.now().day
+			statsDB["requests-%s-%s-%s" % (year, month, day)] = str(int(statsDB["requests-%s-%s-%s" % (year, month, day)]) + 1)
+		except KeyError:
+			statsDB["requests-%s-%s-%s" % (year, month, day)] = "1"
 
 class sspserver():
 

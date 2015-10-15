@@ -1,5 +1,7 @@
+# TO DO: reset stats
+
+import anydbm
 import ConfigParser
-import dbm
 
 class ssp_stats():
 
@@ -9,11 +11,15 @@ class ssp_stats():
         self.config.read("ssp.config")
 
         statsDBLocation = self.config.get("stats", "location")
-        statsDB = dbm.open(statsDBLocation, "c")
+        statsDB = anydbm.open(statsDBLocation, "c")
 
         print(":: Statistics for ssp\n")
         print("[Requests]")
         print(" :: Number of requests (total): %s" % statsDB["requests"])
+        print("\n[Requests by Date]")
+        for keys in statsDB.keys():
+            if (keys != "requests"):
+                print(" :: %s: %s" % (keys[9:], statsDB[keys]))
 
 if __name__ == "__main__":
     s = ssp_stats()
