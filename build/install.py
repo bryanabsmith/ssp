@@ -24,6 +24,7 @@ class install_ssp():
         sspData = sspFile.read()
         with open("ssp_osx_current.tar.gz", "wb") as ssp:
             ssp.write(sspData)
+        
 
 
 if __name__ == "__main__":

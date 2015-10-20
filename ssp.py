@@ -4,10 +4,11 @@
 # If you're testing with the default port of 8888, execute the following to address ""[Errno 48] Address already in use" issues:
 #	sudo lsof -i :8888 and sudo kill -9 <PID>
 
+import anydbm
 import BaseHTTPServer
 import ConfigParser
 import datetime
-import anydbm
+import httpagentparser
 import logging
 import os
 import platform
@@ -116,11 +117,37 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
 	# https://wiki.python.org/moin/BaseHttpServer
 	def do_HEAD(self):
+		# Load the configuration file.
+		self.config.read("ssp.config")
+
+		statsDBLocation = self.config.get("stats", "location")
+		statsDB = anydbm.open(statsDBLocation, "c")
+
 		# Send a 200 (OK) - request succeeded.
 		self.send_response(200)
 
 		# Set the content to html.
 		self.send_header("Content-type", "text/html")
+
+		# http://b.leppoc.net/2010/02/12/simple-webserver-in-python/
+		headers = self.headers.getheader("User-Agent")
+		print(headers)
+		# http://shon.github.io/httpagentparser/
+		simpleheaders = httpagentparser.simple_detect(headers)
+		print(simpleheaders)
+
+		osHeader = str(simpleheaders[0].replace(" ", "_"))
+		browserHeader = str(simpleheaders[1].replace(" ", "_"))
+
+		try:
+			statsDB["os_%s" % osHeader] = str(int(statsDB["os_%s" % osHeader]) + 1)
+		except KeyError:
+			statsDB["os_%s" % osHeader] = "1"
+
+		try:
+			statsDB["browser_%s" % browserHeader] = str(int(statsDB["browser_%s" % browserHeader]) + 1)
+		except KeyError:
+			statsDB["browser_%s" % browserHeader] = "1"
 
 		# End the headers.
 		self.end_headers()
@@ -133,6 +160,12 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
 		# Load the configuration file.
 		self.config.read("ssp.config")
+
+		password = self.config.get("password", "enabled")
+		if password == "yes":
+			# http://effbot.org/librarybook/simplehttpserver.htm
+			print(self.path)
+		# print(self.address_string())
 
 		# "It Works" page.
 		itworks = self.config.get("content", "itworks")
@@ -166,7 +199,11 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 		# If there is an index.html available, use that.
 		elif os.path.isfile("index.html") == True:
 			f = open("index.html", "r")
-			self.wfile.write(f.read())
+			poweredby = self.config.get("content", "poweredby")
+			if poweredby == "true":
+				self.wfile.write(f.read() + "<p style='font-family: \"Arial\"; font-size: 10pt; text-align: center;'><span>Powered by ssp/%s.</span></p>" % SSP_VERSION)
+			else:
+				self.wfile.write(f.read())
 			f.close()
 
 		# Open up the stats database.
@@ -183,9 +220,9 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 			year = datetime.datetime.now().year
 			month = datetime.datetime.now().month
 			day = datetime.datetime.now().day
-			statsDB["requests-%s-%s-%s" % (year, month, day)] = str(int(statsDB["requests-%s-%s-%s" % (year, month, day)]) + 1)
+			statsDB["requests_%s_%s_%s" % (year, month, day)] = str(int(statsDB["requests_%s_%s_%s" % (year, month, day)]) + 1)
 		except KeyError:
-			statsDB["requests-%s-%s-%s" % (year, month, day)] = "1"
+			statsDB["requests_%s_%s_%s" % (year, month, day)] = "1"
 
 class sspserver():
 
