@@ -25,14 +25,15 @@ class ssp_stats():
                     # print(key)
         # else:
         print(":: Statistics for ssp\n")
-        print("[Requests]")
         try:
-            print(" :: Number of requests (total): %s" % statsDB["requests"])
-            print("\n[All Information, Sorted Alphabetically by Key]")
-            for keys in sorted(statsDB.keys()):
-                print(" :: %s: %s" % (keys, statsDB[keys]))
-        except KeyError:
-            print(":: No requests received.")
+            print(sys.argv[1])
+        except IndexError:
+            try:
+                for keys in sorted(statsDB.keys()):
+                    #print(" :: %s: %s" % (keys, statsDB[keys]))
+                    print(" %s=%s" % (keys, statsDB[keys]))
+            except KeyError:
+                print(":: No data.")
 
 if __name__ == "__main__":
     s = ssp_stats()

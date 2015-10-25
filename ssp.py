@@ -29,6 +29,8 @@ PLAT = sys.platform
 WORKSPAGE = """<!DOCTYPE html5>
 <html>
 	<head>
+		<!-- https://css-tricks.com/snippets/html/responsive-meta-tag/ -->
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<style>
 			body {
 				background-color: #eee;
@@ -40,6 +42,13 @@ WORKSPAGE = """<!DOCTYPE html5>
 				border-spacing: 0px;
 				border-style: solid;
 				border-width: 1px;
+				/* http://stackoverflow.com/a/7059453 */
+				margin: 0 auto;
+			}
+
+			h3 {
+				/* http://www.w3.org/Style/Examples/007/center.en.html */
+				text-align: center;
 			}
 
 			th {
