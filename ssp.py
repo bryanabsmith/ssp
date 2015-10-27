@@ -9,6 +9,7 @@ import BaseHTTPServer
 import ConfigParser
 import datetime
 import httpagentparser
+import libuasparser
 import logging
 import os
 import platform
@@ -140,10 +141,10 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
 		# http://b.leppoc.net/2010/02/12/simple-webserver-in-python/
 		headers = self.headers.getheader("User-Agent")
-		print(headers)
+		print(libuasparser.browser_search(headers))
 		# http://shon.github.io/httpagentparser/
 		simpleheaders = httpagentparser.simple_detect(headers)
-		print(simpleheaders)
+		#print(simpleheaders)
 
 		osHeader = str(simpleheaders[0].replace(" ", "_"))
 		browserHeader = str(simpleheaders[1].replace(" ", "_"))
