@@ -141,7 +141,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
 		# http://b.leppoc.net/2010/02/12/simple-webserver-in-python/
 		headers = self.headers.getheader("User-Agent")
-		print(libuasparser.browser_search(headers))
+		#print(libuasparser.browser_search(headers))
 		# http://shon.github.io/httpagentparser/
 		simpleheaders = httpagentparser.simple_detect(headers)
 		#print(simpleheaders)
