@@ -1,4 +1,4 @@
-<img src="www.bryanabsmith.com/ssp/ssp_windows.png"/>
+<img src="http://www.bryanabsmith.com/ssp/ssp_windows.png"/>
 
 # ssp
 Simple web server for the "Summer Server Project."
