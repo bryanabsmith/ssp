@@ -34,7 +34,10 @@ def os_search(uas):
             #if uasPart.find(os) > -1:
             uas_string = uas.split()
             macIndex = uas_string.index("(Macintosh;") # http://stackoverflow.com/a/176921
-            return([uas_string[macIndex+3] + " " + uas_string[macIndex+4], uas_string[macIndex+5].replace("_", ".").strip(")")])
+            codeNames = {"10.0": "Cheetah", "10.1": "Puma", "10.2": "Jaguar", "10.3": "Panther", "10.4": "Tiger", "10.5": "Leopard", "10.6": "Snow Leopard", "10.7": "Lion", "10.8": "Mountain Lion", "10.9": "Mavericks", "10.10": "Yosemite", "10.11": "El Capitan"}
+            osxVersion = uas_string[macIndex+5].replace("_", ".")
+            rootOSXVersion = osxVersion[:-3]
+            return([uas_string[macIndex+3] + " " + uas_string[macIndex+4], osxVersion.strip(")"), codeNames[rootOSXVersion]])
         if os == "Linux":
             uas_string = uas.split()
             linuxIndex = uas_string.index("Linux") # http://stackoverflow.com/a/176921
@@ -47,4 +50,4 @@ def os_search(uas):
 #print("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/601.2.7 (KHTML, like Gecko) Version/9.0.1 Safari/601.2.7".split())
 #print(browSearch("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/601.2.7 (KHTML, like Gecko) Version/9.0.1 Safari/601.2.7"))
 #print(browser_search("Mozilla/5.0 (compatible; MSIE 10.6; Windows NT 6.1; Trident/5.0; InfoPath.2; SLCC1; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET CLR 2.0.50727) 3gpp-gba UNTRUSTED/1.0"))
-#print(os_search("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.16 Safari/537.36"))
+print(os_search("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.27 Safari/537.36"))
