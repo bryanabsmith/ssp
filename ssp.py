@@ -284,12 +284,17 @@ class sspserver():
 		os.chdir(DOCROOT)
 
 		usehost = self.config.get("setup", "usehostname")
+		useLinuxComplex = self.config.get("setup", "use_linux_ip_workaround")
 
-		# Thank to http://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib for the IP tips.
-		if usehost == False:
-			IP = socket.gethostbyname(socket.getfqdn())
+		if useLinuxComplex == "True":
+			# http://stackoverflow.com/a/1267524
+			IP = [l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 80)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0]			
 		else:
-			IP = socket.gethostbyname(socket.gethostname())
+			# Thank to http://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib for the IP tips.
+			if usehost == "False":
+				IP = socket.gethostbyname(socket.getfqdn())
+			else:
+				IP = socket.gethostbyname(socket.gethostname())
 
 		try:
 			# Set up the http handler. This does the "grunt" work. The more fine grained details are handled in the SSPHTTPHandler class.
