@@ -246,6 +246,7 @@ class sspserver():
 		self.config = ConfigParser.RawConfigParser(allow_no_value=True)
 
         # OS X config location
+		# These are all the same for now (planning for platform specific paths).
 		if (PLAT == "darwin"):
 			self.config.read("ssp.config")
         # Windows config location
