@@ -1,6 +1,0 @@
-<html>
-	Hello World!
-	<script type="text/javascript">
-		console.log("Hello!");
-	</script>
-</html>

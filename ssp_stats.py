@@ -3,6 +3,7 @@
 import anydbm
 import ConfigParser
 import sys
+import time
 
 class ssp_stats():
 
@@ -26,7 +27,16 @@ class ssp_stats():
         # else:
         print(":: Statistics for ssp\n")
         try:
-            print(sys.argv[1])
+            option = sys.argv[1]
+            if option == "export_csv":
+                output = "key, value\n"
+                date_time = time.strftime("%H-%M-%S_%d-%m-%Y")
+                for keys in sorted(statsDB.keys()):
+                    output += "%s, %s\n" % (keys, statsDB[keys])
+                output_csv = open("%s/ssp_csv_%s.csv" % (self.config.get("stats", "output_csv"), date_time), "w")
+                output_csv.write(output)
+                output_csv.close()
+                print(" :: Statistics exported to CSV")
         except IndexError:
             try:
                 for keys in sorted(statsDB.keys()):
