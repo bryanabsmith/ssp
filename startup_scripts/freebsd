@@ -1,0 +1,6 @@
+name="sspd"
+rcvar="sspd_enable"
+command="/usr/bin/ssp"
+
+load_rc_config $name
+run_rc_command "$1"

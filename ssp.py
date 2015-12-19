@@ -289,6 +289,9 @@ class sspserver():
 		useLinuxComplex = self.config.get("setup", "use_linux_ip_workaround")
 		useFreeBSDComplex = self.config.get("setup", "use_freebsd_ip_workaround")
 
+		if platform.system() == "FreeBSD" and useFreeBSDComplex == "False":
+			print("It appears that you're running on FreeBSD and don't have 'use_freebsd_ip_workaround' set to True. Please make sure to set this to True to and set 'fbsd_interface' to the interface that you're serving off of.\n\n")
+
 		if useLinuxComplex == "True":
 			# http://stackoverflow.com/a/1267524
 			IP = [l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 80)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0]
