@@ -45,6 +45,7 @@ class ssp_stats():
                 print(" :: Statistics exported to CSV")
         except IndexError:
             try:
+                keyCount = 0
                 for keys in sorted(statsDB.keys()):
                     if showDaily == "False":
                         if keys[:8] == "requests":
@@ -56,6 +57,7 @@ class ssp_stats():
 
                     if visualize == "True":
                         visualize_bars += "\n                                         [\"%s\", %s]," % (keys, statsDB[keys])
+                        keyCount += 1
                 if visualize == "True":
                     # https://developers.google.com/chart/interactive/docs/quick_start#how-about-a-bar-chart
                     visualize_html = """
@@ -74,10 +76,16 @@ class ssp_stats():
                                             %s
                                         ]);
 
+                                        // http://stackoverflow.com/a/10249847
                                         var options = {
                                             "title": "Number of Requests by Date, Browser and OS",
                                             "width": 1000,
-                                            "height": 2000
+                                            "height": %i,
+                                            chartArea: {
+                                                top: 50,
+                                                left: 400,
+                                                width: 1000
+                                            }
                                         };
 
                                         var chart = new google.visualization.BarChart(document.getElementById("chart_div"));
@@ -89,7 +97,7 @@ class ssp_stats():
                                 <div id="chart_div"></div>
                             </body>
                         </html>
-                    """ % visualize_bars[:-1] # http://stackoverflow.com/a/15478161
+                    """ % (visualize_bars[:-1], keyCount*75) # http://stackoverflow.com/a/15478161
                     f = open("visualize_html_%s.html" % date_time, "w")
                     f.writelines(visualize_html)
                     f.close()

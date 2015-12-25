@@ -111,6 +111,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 		if DETAILED == "True":
 			# Print log messages based on the response code. Each time a request is sent to the server, it responds with a three digit code.
 			print("[%s]: %s ==> %s" % (self.log_date_time_string(), self.client_address[0], format%args))
+			logging.info("[%s]: %s ==> %s" % (self.log_date_time_string(), self.client_address[0], format%args))
 		else:
 			# The codes are stored in the second argument of the args array that includes response log messages.
 			code = args[1]
@@ -172,10 +173,6 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 		# Load the configuration file.
 		self.config.read("ssp.config")
 
-		password = self.config.get("password", "enabled")
-		if password == "yes":
-			# http://effbot.org/librarybook/simplehttpserver.htm
-			print(self.path)
 		# print(self.address_string())
 
 		# "It Works" page.
@@ -197,25 +194,42 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 		# Log that headers were sent
 		logging.info("headers")
 
-		# Check to see if an index.html or index.htm already exists. If it doesn't, use one set by the user in the config file.
-		if os.path.isfile("index.html") == False:
-			# This loads the default index file that the user configures.
-			#f = open(itworks, "r")
-			#self.wfile.write(f.read())
-			#f.close()
-			default_page = WORKSPAGE.replace("&version&", SSP_VERSION)
-			default_page = default_page.replace("&docroot&", docroot_dir)
-			default_page = default_page.replace("&platform&", platformName)
-			self.wfile.write(default_page)
-		# If there is an index.html available, use that.
-		elif os.path.isfile("index.html") == True:
-			f = open("index.html", "r")
-			poweredby = self.config.get("content", "poweredby")
-			if poweredby == "true":
-				self.wfile.write(f.read() + "<p style='font-family: \"Arial\"; font-size: 10pt; text-align: center;'><span>Powered by ssp/%s.</span></p>" % SSP_VERSION)
-			else:
+		if self.path == "/":
+			# Check to see if an index.html or index.htm already exists. If it doesn't, use one set by the user in the config file.
+			if os.path.isfile("index.html") == False:
+				# This loads the default index file that the user configures.
+				#f = open(itworks, "r")
+				#self.wfile.write(f.read())
+				#f.close()
+				default_page = WORKSPAGE.replace("&version&", SSP_VERSION)
+				default_page = default_page.replace("&docroot&", docroot_dir)
+				default_page = default_page.replace("&platform&", platformName)
+				self.wfile.write(default_page)
+			# If there is an index.html available, use that.
+			elif os.path.isfile("index.html") == True:
+				f = open("index.html", "r")
+				poweredby = self.config.get("content", "poweredby")
+				if poweredby == "true":
+					self.wfile.write(f.read() + "<p style='font-family: \"Arial\"; font-size: 10pt; text-align: center;'><span>Powered by ssp/%s.</span></p>" % SSP_VERSION)
+				else:
+					self.wfile.write(f.read())
+				f.close()
+		else:
+			try:
+				#print(self.path[1:])
+				# https://wiki.python.org/moin/BaseHttpServer
+				f = open(self.path[1:], "r")
 				self.wfile.write(f.read())
-			f.close()
+				f.close()
+			except IOError as e:
+				if self.path != "/favicon.ico":
+					print("	=> Error: %s (%s)" % (e.strerror, self.path))
+					logging.error("Error: %s (%s)" % (e.strerror, self.path))
+
+					page404 = self.config.get("content", "custom404")
+					f = open(page404, "r")
+					self.wfile.write(f.read())
+					f.close()
 
 		# Open up the stats database.
 		statsDBLocation = self.config.get("stats", "location")
