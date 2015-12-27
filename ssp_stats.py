@@ -42,66 +42,67 @@ class ssp_stats():
                 output_csv = open("%s/ssp_csv_%s.csv" % (self.config.get("stats", "output_csv"), date_time), "w")
                 output_csv.write(output)
                 output_csv.close()
-                print(" :: Statistics exported to CSV")
+                print(":: Statistics exported to %s/ssp_csv_%s.csv" % (self.config.get("stats", "output_csv"), date_time))
+            elif option == "export_html":
+                keyCount = 0
+                for keys in sorted(statsDB.keys()):
+                    visualize_bars += "\n                                         [\"%s\", %s]," % (keys, statsDB[keys])
+                    keyCount += 1
+                # https://developers.google.com/chart/interactive/docs/quick_start#how-about-a-bar-chart
+                visualize_html = """
+                    <html>
+                        <head>
+                            <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+                            <script type="text/javascript">
+                                google.load("visualization", "1.0", {"packages":["corechart"]});
+                                google.setOnLoadCallback(drawGraph);
+                                function drawGraph() {
+                                    var data = new google.visualization.DataTable();
+                                    data.addColumn("string", "requests");
+                                    data.addColumn("number", "Requests");
+
+                                    data.addRows([
+                                        %s
+                                    ]);
+
+                                    // http://stackoverflow.com/a/10249847
+                                    var options = {
+                                        "title": "Number of Requests by Date, Browser and OS",
+                                        "width": 1000,
+                                        "height": %i,
+                                        chartArea: {
+                                            top: 50,
+                                            left: 400,
+                                            width: 1000
+                                        }
+                                    };
+
+                                    var chart = new google.visualization.BarChart(document.getElementById("chart_div"));
+                                    chart.draw(data, options);
+                                }
+                            </script>
+                        </head>
+                        <body>
+                            <div id="chart_div"></div>
+                        </body>
+                    </html>
+                """ % (visualize_bars[:-1], keyCount*75) # http://stackoverflow.com/a/15478161
+                f = open("%s/visualize_html_%s.html" % (self.config.get("stats", "output_html"), date_time), "w")
+                f.writelines(visualize_html)
+                f.close()
+                print(":: Statistics exported to %s/visualize_html_%s.html" % (self.config.get("stats", "output_html"), date_time))
+            else:
+                print("Invalid option. Possible options:\n  :: export_csv - Export the keys and values to a csv file.\n  :: export_html - Export the keys and values to a html file.")
         except IndexError:
             try:
-                keyCount = 0
                 for keys in sorted(statsDB.keys()):
                     if showDaily == "False":
                         if keys[:8] == "requests":
                             pass
                         else:
-                            print(" %s=%s" % (keys, statsDB[keys]))
+                            print(" :: %s=%s" % (keys, statsDB[keys]))
                     else:
-                        print(" %s=%s" % (keys, statsDB[keys]))
-
-                    if visualize == "True":
-                        visualize_bars += "\n                                         [\"%s\", %s]," % (keys, statsDB[keys])
-                        keyCount += 1
-                if visualize == "True":
-                    # https://developers.google.com/chart/interactive/docs/quick_start#how-about-a-bar-chart
-                    visualize_html = """
-                        <html>
-                            <head>
-                                <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-                                <script type="text/javascript">
-                                    google.load("visualization", "1.0", {"packages":["corechart"]});
-                                    google.setOnLoadCallback(drawGraph);
-                                    function drawGraph() {
-                                        var data = new google.visualization.DataTable();
-                                        data.addColumn("string", "requests");
-                                        data.addColumn("number", "Requests");
-
-                                        data.addRows([
-                                            %s
-                                        ]);
-
-                                        // http://stackoverflow.com/a/10249847
-                                        var options = {
-                                            "title": "Number of Requests by Date, Browser and OS",
-                                            "width": 1000,
-                                            "height": %i,
-                                            chartArea: {
-                                                top: 50,
-                                                left: 400,
-                                                width: 1000
-                                            }
-                                        };
-
-                                        var chart = new google.visualization.BarChart(document.getElementById("chart_div"));
-                                        chart.draw(data, options);
-                                    }
-                                </script>
-                            </head>
-                            <body>
-                                <div id="chart_div"></div>
-                            </body>
-                        </html>
-                    """ % (visualize_bars[:-1], keyCount*75) # http://stackoverflow.com/a/15478161
-                    f = open("visualize_html_%s.html" % date_time, "w")
-                    f.writelines(visualize_html)
-                    f.close()
-
+                        print(" :: %s=%s" % (keys, statsDB[keys]))
             except KeyError:
                 print(":: No data.")
 
