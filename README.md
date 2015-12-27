@@ -10,6 +10,11 @@ This is part of a learning project whose goal is to explore how to write a serve
 
 This project is not designed to be used in any sort of production environment. As a learning project, there's a lot about serving content that I don't know and, thus, I'm sure this server is riddled with security holes/weaknesses. Consequently, I take no responsibility for any issues that may arise and, indeed, this should be used as little more than code to learn (or not) from. That said, I do intend for this to work so, in this sense, it should do what it is designed to do - serve web content.
 
+## Testing
+A simple test of spp is to use cURL to send a GET request:
+
+```curl --silent localhost:8888 > /dev/null```
+
 
 ## Licences
 

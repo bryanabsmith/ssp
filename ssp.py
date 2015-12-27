@@ -17,6 +17,7 @@ import SimpleHTTPServer
 import SocketServer
 import socket
 import sys
+import time
 
 PORT = 8888
 SSP_VERSION = "0.1"
@@ -26,72 +27,6 @@ LOGFILE = "ssp.log"
 IP = "0.0.0.0"
 PLAT = sys.platform
 
-# This is the default page for "it works!" (ie. the server is successfully loading content). &version& is replaced with the current version of ssp running.
-WORKSPAGE = """<!DOCTYPE html5>
-<html>
-	<head>
-		<!-- https://css-tricks.com/snippets/html/responsive-meta-tag/ -->
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<style>
-			body {
-				background-color: #eee;
-				font-family: 'Verdana', Geneva, sans-serif;
-				margin: 10%;
-			}
-
-			table {
-				border-spacing: 0px;
-				border-style: solid;
-				border-width: 1px;
-				/* http://stackoverflow.com/a/7059453 */
-				margin: 0 auto;
-			}
-
-			h3 {
-				/* http://www.w3.org/Style/Examples/007/center.en.html */
-				text-align: center;
-			}
-
-			th {
-				background-color: #606060;
-				color: white;
-			}
-
-			th, td {
-				padding: 5px;
-			}
-
-			.evenRow {
-				background-color: #C0C0C0;
-			}
-		</style>
-	</head>
-	<body>
-		<h3>It works!</h3>
-
-		<table>
-			<tr>
-				<th>Property</th>
-				<th>Value</th>
-			</tr>
-			<tr>
-				<td>Version</td>
-				<td>&version&</td>
-			</tr>
-			<tr class="evenRow">
-				<td>Docroot</td>
-				<td>&docroot&</td>
-			</tr>
-			<tr>
-				<td>Platform</td>
-				<td>&platform&</td>
-			</tr>
-		</table>
-	</body>
-</html>
-
-"""
-
 # http://stackoverflow.com/a/25375077
 class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
@@ -99,7 +34,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 	SimpleHTTPServer.SimpleHTTPRequestHandler.server_version = SSP_VERSION
 
 	# ConfigParser for the Handler class
-	config = ConfigParser.RawConfigParser(allow_no_value=True)
+	config = ConfigParser.SafeConfigParser(allow_no_value=True)
 
 	def log_message(self, format, *args):
 		"""
@@ -161,6 +96,13 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 		except KeyError:
 			statsDB["browser_%s" % browserHeader] = "1"
 
+		CLIENTINFO = self.config.get("setup", "clientInfo")
+
+		# Check to see if the user wants detailed logging.
+		if CLIENTINFO == "True":
+			cInfo = "	==> %s, %s" % (osHeader.replace("_", " "), browserHeader.replace("_", " "))
+			print(cInfo)
+			logging.info(cInfo)
 		# End the headers.
 		self.end_headers()
 
@@ -176,7 +118,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 		# print(self.address_string())
 
 		# "It Works" page.
-		itworks = self.config.get("content", "itworks")
+		# itworks = self.config.get("content", "itworks")
 
 		docroot_dir = self.config.get("content", "docroot")
 
@@ -196,40 +138,69 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
 		if self.path == "/":
 			# Check to see if an index.html or index.htm already exists. If it doesn't, use one set by the user in the config file.
-			if os.path.isfile("index.html") == False:
+			if os.path.isfile("%s/index.html" % docroot_dir) == False:
 				# This loads the default index file that the user configures.
-				#f = open(itworks, "r")
-				#self.wfile.write(f.read())
-				#f.close()
-				default_page = WORKSPAGE.replace("&version&", SSP_VERSION)
-				default_page = default_page.replace("&docroot&", docroot_dir)
-				default_page = default_page.replace("&platform&", platformName)
-				self.wfile.write(default_page)
+				try:
+					default_page = open("html/default_index.html", "r")
+					page = default_page.read()
+					page = page.replace("&version&", SSP_VERSION)
+					page = page.replace("&docroot&", docroot_dir)
+					page = page.replace("&platform&", platformName)
+					self.wfile.write(page)
+					default_page.close()
+				except IOError as e:
+					print("	=> Error: %s (%s)" % (e.strerror, self.path))
+					logging.error("Error: %s (%s)" % (e.strerror, self.path))
 			# If there is an index.html available, use that.
-			elif os.path.isfile("index.html") == True:
-				f = open("index.html", "r")
-				poweredby = self.config.get("content", "poweredby")
-				if poweredby == "true":
-					self.wfile.write(f.read() + "<p style='font-family: \"Arial\"; font-size: 10pt; text-align: center;'><span>Powered by ssp/%s.</span></p>" % SSP_VERSION)
-				else:
-					self.wfile.write(f.read())
-				f.close()
+			elif os.path.isfile("%s/index.html" % docroot_dir) == True:
+					f = open("%s/index.html" % docroot_dir, "r")
+					poweredby = self.config.get("content", "poweredby")
+					if poweredby == "true":
+						self.wfile.write(f.read() + "<p style='font-family: \"Arial\"; font-size: 10pt; text-align: center;'><span>Powered by ssp/%s.</span></p>" % SSP_VERSION)
+					else:
+						self.wfile.write(f.read())
+					f.close()
 		else:
 			try:
-				#print(self.path[1:])
 				# https://wiki.python.org/moin/BaseHttpServer
-				f = open(self.path[1:], "r")
+				f = open("%s/%s" % (docroot_dir, self.path[1:]), "r")
 				self.wfile.write(f.read())
 				f.close()
 			except IOError as e:
 				if self.path != "/favicon.ico":
-					print("	=> Error: %s (%s)" % (e.strerror, self.path))
-					logging.error("Error: %s (%s)" % (e.strerror, self.path))
+					if e.strerror == "Is a directory":
+						try:
+							f = open("%sindex.html" % self.path[1:], "r")
+							poweredby = self.config.get("content", "poweredby")
+							if poweredby == "true":
+								self.wfile.write(f.read() + "<p style='font-family: \"Arial\"; font-size: 10pt; text-align: center;'><span>Powered by ssp/%s.</span></p>" % SSP_VERSION)
+							else:
+								self.wfile.write(f.read())
+							f.close()
+						except IOError:
+							print("	=> Error: %s (%s)" % (e.strerror, self.path))
+							logging.error("Error: %s (%s)" % (e.strerror, self.path))
 
-					page404 = self.config.get("content", "custom404")
-					f = open(page404, "r")
-					self.wfile.write(f.read())
-					f.close()
+							page404 = self.config.get("content", "custom404")
+							f = open(page404, "r")
+							poweredby = self.config.get("content", "poweredby")
+							if poweredby == "true":
+								self.wfile.write(f.read() + "<p style='font-family: \"Arial\"; font-size: 10pt; text-align: center;'><span>Powered by ssp/%s.</span></p>" % SSP_VERSION)
+							else:
+								self.wfile.write(f.read())
+							f.close()
+					else:
+						print("	=> Error: %s (%s)" % (e.strerror, self.path))
+						logging.error("Error: %s (%s)" % (e.strerror, self.path))
+
+						page404 = self.config.get("content", "custom404")
+						f = open(page404, "r")
+						self.wfile.write(f.read())
+						f.close()
+
+		#x = open("/Users/vansmith/index.html", "r")
+		#self.wfile.write(x.read())
+		#x.close()
 
 		# Open up the stats database.
 		statsDBLocation = self.config.get("stats", "location")
@@ -255,6 +226,8 @@ class sspserver():
 		"""
 			Constructor for main server class.
 		"""
+
+		startTime = time.time()
 
 		# Setup the configuration parser.
 		self.config = ConfigParser.RawConfigParser(allow_no_value=True)
@@ -297,7 +270,7 @@ class sspserver():
 		# ITWORKS = self.config.get("content", "itworks")
 
 		# Change the working directory to the one specified for the docroot. This ensures that we are serving content out of the docroot directory.
-		os.chdir(DOCROOT)
+		# os.chdir(DOCROOT)
 
 		usehost = self.config.get("setup", "usehostname")
 		useLinuxComplex = self.config.get("setup", "use_linux_ip_workaround")
@@ -316,13 +289,14 @@ class sspserver():
 			IP = netifaces.ifaddresses(freeBSDInterface)[2][0]["addr"]
 		else:
 			try:
+
 				# Thank to http://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib for the IP tips.
 				if usehost == "False":
 					IP = socket.gethostbyname(socket.getfqdn())
 				else:
 					IP = socket.gethostbyname(socket.gethostname())
 			except socket.gaierror:
-				IP = ""
+				IP = "ERROR GETTING IP"
 
 		try:
 			# Set up the http handler. This does the "grunt" work. The more fine grained details are handled in the SSPHTTPHandler class.
@@ -352,6 +326,15 @@ class sspserver():
 			httpd.serve_forever()
 		except KeyboardInterrupt:
 			# self.statsDB.close()
+			# http://stackoverflow.com/a/1557584
+			runTime = time.time() - startTime
+
+			# http://stackoverflow.com/a/775075
+			minutes, seconds = divmod(runTime, 60)
+			hours, minutes = divmod(minutes, 60)
+			runTime = "Run Time: %d:%02d:%02d" % (hours, minutes, seconds)
+			print "Closing ssp...\n\n%s" % runTime
+			logging.info(runTime)
 			# If Control-C is pressed, kill the server.
 			sys.exit(0)
 

@@ -1,0 +1,63 @@
+<!DOCTYPE html5>
+<html>
+	<head>
+		<!-- https://css-tricks.com/snippets/html/responsive-meta-tag/ -->
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<style>
+			body {
+				background-color: #eee;
+				font-family: 'Verdana', Geneva, sans-serif;
+				margin: 10%;
+			}
+
+			table {
+				border-spacing: 0px;
+				border-style: solid;
+				border-width: 1px;
+				/* http://stackoverflow.com/a/7059453 */
+				margin: 0 auto;
+			}
+
+			h3 {
+				/* http://www.w3.org/Style/Examples/007/center.en.html */
+				text-align: center;
+			}
+
+			th {
+				background-color: #606060;
+				color: white;
+			}
+
+			th, td {
+				padding: 5px;
+			}
+
+			.evenRow {
+				background-color: #C0C0C0;
+			}
+		</style>
+	</head>
+	<body>
+		<h3>It works!</h3>
+		<p>The server is up and running but no index.html file was found. Please place your index in the root directory (see ssp.config).</p>
+		<h3>Server Information</h3>
+		<table>
+			<tr>
+				<th>Property</th>
+				<th>Value</th>
+			</tr>
+			<tr>
+				<td>Version</td>
+				<td>&version&</td>
+			</tr>
+			<tr class="evenRow">
+				<td>Docroot</td>
+				<td>&docroot&</td>
+			</tr>
+			<tr>
+				<td>Platform</td>
+				<td>&platform&</td>
+			</tr>
+		</table>
+	</body>
+</html>
