@@ -1,0 +1,224 @@
+<html>
+  <head>
+    <link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <style>
+      /*
+        Color Scheme:
+          - Light Green: 8CDEC7
+          - Medium Green: 73D9B3
+          - Dark Green: 4EA686
+          - White: F2F2F0
+          - Orange: D98E7E
+          Source: https://color.adobe.com/Theme-67-color-theme-7363165/edit/?copy=true&base=2&rule=Custom&selected=4&name=Copy%20of%20Theme%2067&mode=rgb&rgbvalues=0.6,0.9490196078431372,0.8509803921568627,0.4509803921568628,0.8509803921568627,0.7019607843137254,0.3058823529411765,0.6509803921568628,0.5254901960784314,0.9490196078431372,0.9490196078431372,0.9411764705882353,0.8509803921568627,0.5568627450980392,0.4941176470588236&swatchOrder=0,1,2,3,4
+      */
+
+      body {
+        font-family: 'Raleway', sans-serif;
+        background-color: #F2F2F0;
+        margin: 5%;
+      }
+
+      a {
+        color: #8CDEC7;
+        text-decoration: none;
+      }
+
+      .topHeading {
+        color: #4EA686;
+        font-size: 15pt;
+      }
+
+      .midHeading {
+        color: #73D9B3;
+        font-size: 13pt;
+      }
+
+      .lowHeading {
+        color: #D98E7E;
+        font-size: 11pt;
+      }
+
+      .codePrompt {
+        color: #8CDEC7;
+        padding-right: 0.5em; /* http://stackoverflow.com/a/1571662 */
+      }
+
+      .codeBlock {
+        background-color: #404040;
+        border-radius: 5px;
+        color: #F2F2F0;
+        padding: 20px;
+        width: auto;
+      }
+      .largeSpacer {
+        height: 50px;
+      }
+
+      .smallSpacer {
+        height: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <span class="topHeading">ssp</span>, <span class="midHeading">0.1</span>
+    <p class="largeSpacer"></p>
+    <span class="topHeading" style="margin-top: 30%;" id="toc">Table of Contents</span>
+    <ol>
+      <!-- http://stackoverflow.com/a/12386255 -->
+      <li><a href="#installSetup">Installing and Setup</a></li>
+      <li><a href="#configure">Configuring: ssp.config</a></li>
+    </ol>
+    <p class="largeSpacer"></p>
+    <span class="topHeading" id="installSetup">Installing and Setup</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
+    <div>
+      ssp works on Windows, OS X, Linux and FreeBSD<sup>1</sup>.
+      <p></p>
+      <sup>1</sup> FreeBSD support is, let's say, "beta" as the OS has some idiosyncrasies that don't exist with Windows/OS X/Linux.
+      <p class="smallSpacer"></p>
+      <span class="midHeading">Supported OSes</span>
+      <p></p>
+      <span class="lowHeading">Tested</span>
+      <br \>
+      <div style="margin-left: 20px;">
+        <i class="ionicons ion-social-windows"></i> - Windows 10
+        <br \>
+        <i class="ionicons ion-social-apple"></i> - OS X 10.11
+        <br \>
+        <i class="ionicons ion-social-tux"></i> - Linux (CentOS 7)
+        <br \>
+        <i class="ionicons ion-social-freebsd-devil"></i> - FreeBSD 10.2
+      </div>
+      <p class="smallSpacer"></p>
+      <span class="midHeading">Requirements</span>
+      <p></p>
+      <ul>
+        <li>If you run the source version, you'll need Python 2. Please note that Python 2 is an absolute requirement as Python 3 is not (yet) supported.</li>
+        <li>python-netifaces (if you run the source version)</li>
+      </ul>
+      <br \>
+      <span class="midHeading">Installing</span>
+      <p></p>
+      <span class="lowHeading">Git</span>
+      <br \>
+      You can get the most recent code from GitHub. To do so, execute the following:
+      <p></p>
+      <div class="codeBlock">
+        <span class="codePrompt">$</span>git clone https://github.com/bryanabsmith/ssp.git
+      </div>
+      <p></p>
+      This will download the ssp source code which can be run as-is - no compilation necessary. This isn't to say that everything is good to go out of the box as you will want to configure ssp before running it (see <a href="#configure">Configuring</a>).
+      <p></p>
+      Once you've got the source, simply change into the directory with ssp:
+      <p></p>
+      <div class="codeBlock">
+        <span class="codePrompt">$</span>cd ssp/
+      </div>
+      <p></p>
+      And execute the ssp Python script:
+      <p></p>
+      <div class="codeBlock">
+        <span class="codePrompt">$</span>python ssp.py
+      </div>
+    </div>
+
+    <p class="largeSpacer"></p>
+    <span class="topHeading" id="configure">Configure: ssp.config</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
+    <div>
+      Before you jump in, you'll want to edit ssp.config.
+      <p class="smallSpacer"></p>
+      <span class="midHeading">ssp.config</span>
+      <br \>
+      To best explore the configuration file, let's look at it one section at a time.
+      <p></p>
+      <span class="lowHeading">[setup]</span>
+      <p></p>
+      <div class="codeBlock">
+        # This can be any valid port.
+        <br \>
+        # Possible values: 1025-65536
+        <br \>
+        <span class="codePrompt">port=8888</span>
+        <p></p>
+        # Detailed logging information. Do you want to know everything or just a brief overview with each request?
+        <br \>
+        # Possible values: True or False (or anything technically as anything but True is counted as False)
+        <br \>
+        <span class="codePrompt">detailed=True</span>
+        <p></p>
+        # Print out client info to the console when requests are made.
+        <br \>
+        # Possible values: True or False (or anything technically as anything but True is counted as False)
+        <br \>
+        <span class="codePrompt">clientInfo=True</span>
+        <p></p>
+        # Where should content be logged.
+        <br \>
+        <span class="codePrompt">logfile=ssp.log</span>
+        <p></p>
+        # This controls how ssp reports the IP that pages are served from. There are two options, True or False. If set to True (or anything but False), your local host's IP address is returned. If this is False, a fully qualified domain name is returned. If you're unsure as to what you should use, try setting this to True and if you don't see your local IP, set it to False. On some platforms with different host configurations, this may require some trial and error.
+        <br \>
+        <span class="codePrompt">usehostname=True</span>
+        <p></p>
+        # FreeBSD throws an error when getting the IP unless a workaround (netifaces) is used and Linux sometimes doesn't report back the proper interface. Setting this to True makes use of an alternative method to get your local IP.
+        <br \>
+        # NOTE: Using netifaces requires that you have it installed. Execute "pip install netifaces" or use your Linux distribution's or FreeBSD's native netifaces packages (ports: /net/py27-netifaces) if you're running the Python version.
+        <br \>
+        # NOTE 2: While OS X also qualifies as *nix, this workaround isn't needed but can be used.
+        <br \>
+        <span class="codePrompt">use_nix_ip_workaround=False</span>
+        <p></p>
+        # If you use the *nix workaround above, set the network interface here.
+        <br \>
+        <span class="codePrompt">nix_interface=en1</span>
+      </div>
+    </div>
+    <p></p>
+    Use this section to set default values for basic functionality. This is also the section to set OS specific values. For example, Linux machines may require a workaround to get the IP displayed when started and FreeBSD will most definitely need the workaround (use_nix_ip_workaround and nix_interface preferences) set (at least on 10.2) and will require you to set the network interface that you'll be serving on.
+    <p></p>
+    <span class="lowHeading">[content]</span>
+    <p></p>
+    <div class="codeBlock">
+      # The docroot (where the server should look for things to serve)
+      <br \>
+      # Possible values: a valid directory.
+      <br \>
+      <span class="codePrompt">docroot=webroot/</span>
+      <p></p>
+      # This inserts a "powered by" string at the bottom.
+      <br \>
+      # Possible values: true or false.
+      <br \>
+      <span class="codePrompt">poweredby=true</span>
+      <p></p>
+      # Custom 404 page.
+      <br \>
+      <span class="codePrompt">custom404=html/404.html</span>
+    </div>
+    <p></p>
+    The docroot is the key property here - this is where you'll be serving content out of. You can also add a "Powered by ssp" label to the bottom of each page if you so choose. Finally, you can set a custom 404 page if someone requests a page that doesn't exist.
+
+
+    <p></p>
+    <span class="lowHeading">[redirect]</span>
+    <p></p>
+    <div class="codeBlock">
+      # Redirect to a different page if you've moved hosts or for whatever reason.
+      <br \>
+      # Possible values: True or False
+      <br \>
+      <span class="codePrompt">redirect=False</span>
+      <p></p>
+      # The URL to redirect to if 'redirect' is set to True.
+      <br \>
+      <span class="codePrompt">url=http://www.example.com</span>
+      <p></p>
+      # Timeout for the redirect
+      <br \>
+      <span class="codePrompt">timeout=5</span>
+    </div>
+    <p></p>
+    This section outlines whether or not you want to redirect users to a different location. Note: this is an "all or nothing" situation; use this only if you've move hosts.
+  </body>
+</html>

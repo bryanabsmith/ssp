@@ -14,7 +14,11 @@ class ssp_stats():
         self.config.read("ssp.config")
 
         statsDBLocation = self.config.get("stats", "location")
-        statsDB = anydbm.open(statsDBLocation, "c")
+        try:
+            statsDB = anydbm.open("%s/ssp_stats.db" % statsDBLocation, "c")
+        except:
+            print(" :: It would appear as though the [stats] -> location configuration option is set to a location that isn't a valid directory. Please set it to a valid directory and re-execute ssp_stats.")
+            sys.exit(0)
 
         showDaily = self.config.get("stats", "show_daily_requests")
 
@@ -32,7 +36,7 @@ class ssp_stats():
                     # del statsDB[key]
                     # print(key)
         # else:
-        print(":: Statistics for ssp\n")
+        print(":: Statistics for ssp")
         try:
             option = sys.argv[1]
             if option == "export_csv":
@@ -42,7 +46,7 @@ class ssp_stats():
                 output_csv = open("%s/ssp_csv_%s.csv" % (self.config.get("stats", "output_csv"), date_time), "w")
                 output_csv.write(output)
                 output_csv.close()
-                print(":: Statistics exported to %s/ssp_csv_%s.csv" % (self.config.get("stats", "output_csv"), date_time))
+                print(" :: Statistics exported to %s/ssp_csv_%s.csv" % (self.config.get("stats", "output_csv"), date_time))
             elif option == "export_html":
                 keyCount = 0
                 for keys in sorted(statsDB.keys()):
@@ -90,9 +94,9 @@ class ssp_stats():
                 f = open("%s/visualize_html_%s.html" % (self.config.get("stats", "output_html"), date_time), "w")
                 f.writelines(visualize_html)
                 f.close()
-                print(":: Statistics exported to %s/visualize_html_%s.html" % (self.config.get("stats", "output_html"), date_time))
+                print(" :: Statistics exported to %s/visualize_html_%s.html" % (self.config.get("stats", "output_html"), date_time))
             else:
-                print("Invalid option. Possible options:\n  :: export_csv - Export the keys and values to a csv file.\n  :: export_html - Export the keys and values to a html file.")
+                print(" :: Invalid option. Possible options:\n     :: export_csv - Export the keys and values to a csv file.\n     :: export_html - Export the keys and values to a html file.")
         except IndexError:
             try:
                 for keys in sorted(statsDB.keys()):

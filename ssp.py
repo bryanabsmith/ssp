@@ -68,7 +68,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 		self.config.read("ssp.config")
 
 		statsDBLocation = self.config.get("stats", "location")
-		statsDB = anydbm.open(statsDBLocation, "c")
+		statsDB = anydbm.open("%s/ssp_stats.db" % statsDBLocation, "c")
 
 		# Send a 200 (OK) - request succeeded.
 		self.send_response(200)
@@ -136,67 +136,77 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 		# Log that headers were sent
 		logging.info("headers")
 
-		if self.path == "/":
-			# Check to see if an index.html or index.htm already exists. If it doesn't, use one set by the user in the config file.
-			if os.path.isfile("%s/index.html" % docroot_dir) == False:
-				# This loads the default index file that the user configures.
-				try:
-					default_page = open("html/default_index.html", "r")
-					page = default_page.read()
-					page = page.replace("&version&", SSP_VERSION)
-					page = page.replace("&docroot&", docroot_dir)
-					page = page.replace("&platform&", platformName)
-					self.wfile.write(page)
-					default_page.close()
-				except IOError as e:
-					print("	=> Error: %s (%s)" % (e.strerror, self.path))
-					logging.error("Error: %s (%s)" % (e.strerror, self.path))
-			# If there is an index.html available, use that.
-			elif os.path.isfile("%s/index.html" % docroot_dir) == True:
-					f = open("%s/index.html" % docroot_dir, "r")
-					poweredby = self.config.get("content", "poweredby")
-					if poweredby == "true":
-						self.wfile.write(f.read() + "<p style='font-family: \"Arial\"; font-size: 10pt; text-align: center;'><span>Powered by ssp/%s.</span></p>" % SSP_VERSION)
-					else:
-						self.wfile.write(f.read())
-					f.close()
+		redirectValue = self.config.get("redirect", "redirect")
+		redirectURL = self.config.get("redirect", "url")
+		redirectTimeout = self.config.getint("redirect", "timeout")
+
+		if redirectValue == "True":
+			self.wfile.write("<h4>Page has moved. Redirecting in %s seconds...</h4>" % str(redirectTimeout))
+			time.sleep(redirectTimeout)
+			# https://css-tricks.com/redirect-web-page/
+			self.wfile.write("<meta http-equiv=\"refresh\" content=\"0; URL='%s'\" />" % redirectURL)
 		else:
-			try:
-				# https://wiki.python.org/moin/BaseHttpServer
-				f = open("%s/%s" % (docroot_dir, self.path[1:]), "r")
-				self.wfile.write(f.read())
-				f.close()
-			except IOError as e:
-				if self.path != "/favicon.ico":
-					if e.strerror == "Is a directory":
-						try:
-							f = open("%sindex.html" % self.path[1:], "r")
-							poweredby = self.config.get("content", "poweredby")
-							if poweredby == "true":
-								self.wfile.write(f.read() + "<p style='font-family: \"Arial\"; font-size: 10pt; text-align: center;'><span>Powered by ssp/%s.</span></p>" % SSP_VERSION)
-							else:
-								self.wfile.write(f.read())
-							f.close()
-						except IOError:
+			if self.path == "/":
+				# Check to see if an index.html or index.htm already exists. If it doesn't, use one set by the user in the config file.
+				if os.path.isfile("%s/index.html" % docroot_dir) == False:
+					# This loads the default index file that the user configures.
+					try:
+						default_page = open("html/default_index.html", "r")
+						page = default_page.read()
+						page = page.replace("&version&", SSP_VERSION)
+						page = page.replace("&docroot&", docroot_dir)
+						page = page.replace("&platform&", platformName)
+						self.wfile.write(page)
+						default_page.close()
+					except IOError as e:
+						print("	=> Error: %s (%s)" % (e.strerror, self.path))
+						logging.error("Error: %s (%s)" % (e.strerror, self.path))
+				# If there is an index.html available, use that.
+				elif os.path.isfile("%s/index.html" % docroot_dir) == True:
+						f = open("%s/index.html" % docroot_dir, "r")
+						poweredby = self.config.get("content", "poweredby")
+						if poweredby == "true":
+							self.wfile.write(f.read() + "<p style='font-family: \"Arial\"; font-size: 10pt; text-align: center;'><span>Powered by ssp/%s.</span></p>" % SSP_VERSION)
+						else:
+							self.wfile.write(f.read())
+						f.close()
+			else:
+				try:
+					# https://wiki.python.org/moin/BaseHttpServer
+					f = open("%s/%s" % (docroot_dir, self.path[1:]), "r")
+					self.wfile.write(f.read())
+					f.close()
+				except IOError as e:
+					if self.path != "/favicon.ico":
+						if e.strerror == "Is a directory":
+							try:
+								f = open("%sindex.html" % self.path[1:], "r")
+								poweredby = self.config.get("content", "poweredby")
+								if poweredby == "true":
+									self.wfile.write(f.read() + "<p style='font-family: \"Arial\"; font-size: 10pt; text-align: center;'><span>Powered by ssp/%s.</span></p>" % SSP_VERSION)
+								else:
+									self.wfile.write(f.read())
+								f.close()
+							except IOError:
+								print("	=> Error: %s (%s)" % (e.strerror, self.path))
+								logging.error("Error: %s (%s)" % (e.strerror, self.path))
+
+								page404 = self.config.get("content", "custom404")
+								f = open(page404, "r")
+								poweredby = self.config.get("content", "poweredby")
+								if poweredby == "true":
+									self.wfile.write(f.read() + "<p style='font-family: \"Arial\"; font-size: 10pt; text-align: center;'><span>Powered by ssp/%s.</span></p>" % SSP_VERSION)
+								else:
+									self.wfile.write(f.read())
+								f.close()
+						else:
 							print("	=> Error: %s (%s)" % (e.strerror, self.path))
 							logging.error("Error: %s (%s)" % (e.strerror, self.path))
 
 							page404 = self.config.get("content", "custom404")
 							f = open(page404, "r")
-							poweredby = self.config.get("content", "poweredby")
-							if poweredby == "true":
-								self.wfile.write(f.read() + "<p style='font-family: \"Arial\"; font-size: 10pt; text-align: center;'><span>Powered by ssp/%s.</span></p>" % SSP_VERSION)
-							else:
-								self.wfile.write(f.read())
+							self.wfile.write(f.read())
 							f.close()
-					else:
-						print("	=> Error: %s (%s)" % (e.strerror, self.path))
-						logging.error("Error: %s (%s)" % (e.strerror, self.path))
-
-						page404 = self.config.get("content", "custom404")
-						f = open(page404, "r")
-						self.wfile.write(f.read())
-						f.close()
 
 		#x = open("/Users/vansmith/index.html", "r")
 		#self.wfile.write(x.read())
@@ -204,7 +214,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
 		# Open up the stats database.
 		statsDBLocation = self.config.get("stats", "location")
-		statsDB = anydbm.open(statsDBLocation, "c")
+		statsDB = anydbm.open("%s/ssp_stats.db" % statsDBLocation, "c")
 
 		# Add a value to the total requests
 		try:
@@ -273,20 +283,17 @@ class sspserver():
 		# os.chdir(DOCROOT)
 
 		usehost = self.config.get("setup", "usehostname")
-		useLinuxComplex = self.config.get("setup", "use_linux_ip_workaround")
-		linuxOutbound = self.config.get("setup", "use_linux_ip_outbond_test")
-		useFreeBSDComplex = self.config.get("setup", "use_freebsd_ip_workaround")
+		useNixComplex = self.config.get("setup", "use_nix_ip_workaround")
+		#linuxOutbound = self.config.get("setup", "use_linux_ip_outbond_test")
+		#useFreeBSDComplex = self.config.get("setup", "use_freebsd_ip_workaround")
 
-		if platform.system() == "FreeBSD" and useFreeBSDComplex == "False":
+		if platform.system() == "FreeBSD" or PLAT.find("linux") > -1 and useNixComplex == "False":
 			print("It appears that you're running on FreeBSD and don't have 'use_freebsd_ip_workaround' set to True. Please make sure to set this to True to and set 'fbsd_interface' to the interface that you're serving off of.\n\n")
 
-		if useLinuxComplex == "True":
-			# http://stackoverflow.com/a/1267524
-			IP = [l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [[(s.connect(('%s' % linuxOutbound, 80)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0]
-		elif useFreeBSDComplex == "True":
+		if useNixComplex == "True":
 			import netifaces
-			freeBSDInterface = self.config.get("setup", "fbsd_interface")
-			IP = netifaces.ifaddresses(freeBSDInterface)[2][0]["addr"]
+			interface = self.config.get("setup", "nix_interface")
+			IP = netifaces.ifaddresses(interface)[2][0]["addr"]
 		else:
 			try:
 

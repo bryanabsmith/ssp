@@ -1,0 +1,45 @@
+
+                    <html>
+                        <head>
+                            <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+                            <script type="text/javascript">
+                                google.load("visualization", "1.0", {"packages":["corechart"]});
+                                google.setOnLoadCallback(drawGraph);
+                                function drawGraph() {
+                                    var data = new google.visualization.DataTable();
+                                    data.addColumn("string", "requests");
+                                    data.addColumn("number", "Requests");
+
+                                    data.addRows([
+                                        
+                                         ["browser_Chrome_48.0.2564.48", 34],
+                                         ["browser_ChromeiOS_47.0.2526.107", 6],
+                                         ["os_MacOS_Macintosh_X_10.11.2", 34],
+                                         ["os_iPhone_iOS_9.2", 6],
+                                         ["requests", 39],
+                                         ["requests_2015_12_27", 33],
+                                         ["requests_2015_12_28", 6]
+                                    ]);
+
+                                    // http://stackoverflow.com/a/10249847
+                                    var options = {
+                                        "title": "Number of Requests by Date, Browser and OS",
+                                        "width": 1000,
+                                        "height": 525,
+                                        chartArea: {
+                                            top: 50,
+                                            left: 400,
+                                            width: 1000
+                                        }
+                                    };
+
+                                    var chart = new google.visualization.BarChart(document.getElementById("chart_div"));
+                                    chart.draw(data, options);
+                                }
+                            </script>
+                        </head>
+                        <body>
+                            <div id="chart_div"></div>
+                        </body>
+                    </html>
+                
