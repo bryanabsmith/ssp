@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import anydbm
 import ConfigParser
 import sys
