@@ -69,9 +69,12 @@
       <!-- http://stackoverflow.com/a/12386255 -->
       <li><a href="#installSetup">Installing and Setup</a></li>
       <li><a href="#configure">Configuring: ssp.config</a></li>
+      <li><a href="#using">Using</a></li>
+      <li><a href="#stats">Statistics: ssp_stats</a></li>
     </ol>
     <p class="largeSpacer"></p>
     <span class="topHeading" id="installSetup">Installing and Setup</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
+    <p></p>
     <div>
       ssp works on Windows, OS X, Linux and FreeBSD<sup>1</sup>.
       <p></p>
@@ -86,7 +89,7 @@
         <br \>
         <i class="ionicons ion-social-apple"></i> - OS X 10.11
         <br \>
-        <i class="ionicons ion-social-tux"></i> - Linux (CentOS 7)
+        <i class="ionicons ion-social-tux"></i> - Linux (tested on CentOS 7)
         <br \>
         <i class="ionicons ion-social-freebsd-devil"></i> - FreeBSD 10.2
       </div>
@@ -108,7 +111,7 @@
         <span class="codePrompt">$</span>git clone https://github.com/bryanabsmith/ssp.git
       </div>
       <p></p>
-      This will download the ssp source code which can be run as-is - no compilation necessary. This isn't to say that everything is good to go out of the box as you will want to configure ssp before running it (see <a href="#configure">Configuring</a>).
+      This will download the ssp source code which can be run as-is - no compilation necessary. This isn't to say that everything is good to go out of the box as you will want to configure ssp before running it (see <a href="#configure">Configuring: ssp.config</a>).
       <p></p>
       Once you've got the source, simply change into the directory with ssp:
       <p></p>
@@ -125,6 +128,7 @@
 
     <p class="largeSpacer"></p>
     <span class="topHeading" id="configure">Configure: ssp.config</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
+    <p></p>
     <div>
       Before you jump in, you'll want to edit ssp.config.
       <p class="smallSpacer"></p>
@@ -194,12 +198,10 @@
       <p></p>
       # Custom 404 page.
       <br \>
-      <span class="codePrompt">custom404=html/404.html</span>
+      <span class="codePrompt">custom404=webroot/404.html</span>
     </div>
     <p></p>
     The docroot is the key property here - this is where you'll be serving content out of. You can also add a "Powered by ssp" label to the bottom of each page if you so choose. Finally, you can set a custom 404 page if someone requests a page that doesn't exist.
-
-
     <p></p>
     <span class="lowHeading">[redirect]</span>
     <p></p>
@@ -220,5 +222,168 @@
     </div>
     <p></p>
     This section outlines whether or not you want to redirect users to a different location. Note: this is an "all or nothing" situation; use this only if you've move hosts.
+
+    <p></p>
+    <span class="lowHeading">[stats]</span>
+    <p></p>
+    <div class="codeBlock">
+      # The location of the database with statistics info.
+      <br \>
+      # Possible values: a valid directory and file location.
+      <br \>
+      <span class="codePrompt">location=.</span>
+      <p></p>
+      # Output location for csv file (if selected as an option).
+      <br \>
+      <span class="codePrompt">output_csv=.</span>
+      <p></p>
+      # Output location for the html graph file.
+      <br \>
+      <span class="codePrompt">output_html=.</span>
+      <p></p>
+      # Show the daily requests. By default, the requests by date are shown which could get overwhelming.
+      <br \>
+      <span class="codePrompt">show_daily_requests=True</span>
+      <!--<p></p>
+      # Show the number of requests in a bar chart.
+      <br \>
+      <span class="codePrompt">visual_requests=True</span>-->
+    </div>
+    <p></p>
+    This section controls the settings for ssp_stats. Much of this is self-explanatory - location and the output_csv and output_html settings control the locations of the stats db and where various types of output ought to be stored. show_daily_requests determines whether or not you see daily activity (which might get overwhelming and/or it might be irrelevant to you).
+
+    <p class="largeSpacer"></p>
+    <span class="topHeading" id="using">Using</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
+    <p></p>
+    <div>
+        ssp is a simple Python script that can be executed like so:
+        <p></p>
+        <div class="codeBlock">
+          <span class="codePrompt">$</span>python ssp.py
+        </div>
+        <p></p>
+        Once you do that, you'll see something similar to the following:
+        <p></p>
+        <div class="codeBlock">
+          => ssp/0.1 running on darwin
+          <br \>
+            &emsp;&emsp;&emsp;==> Serving on port 8888<span class="codePrompt"><sup>1</sup></span>
+            <br \>
+            &emsp;&emsp;&emsp;==> Serving on IP 192.168.2.105<span class="codePrompt"><sup>2</sup></span>
+            <br \>
+            &emsp;&emsp;&emsp;==> Serving out of webroot/<span class="codePrompt"><sup>3</sup></span>
+          <p></p>
+          Log:
+        </div>
+        <p></p>
+        At this point, you can navigate to the URL <span style="font-style: italic;">http://1:2</span> from above, so, in this case, http://192.168.2.105:8888.
+        <p></p>
+        If you need a quick test on a system without X/UI and you have cURL available to you, execute the following (replace IP as appropriate):
+        <p></p>
+        <div class="codeBlock">
+          <span class="codePrompt">$</span>curl --silent 192.168.2.105:8888 > /dev/null
+        </div>
+        <p></p>
+        When you execute that, you will see a single request registered in ssp from an unknown browser and OS from the IP of the machine that you make the request from.
+        <p></p>
+        When you navigate to that page from a web browser, you'll see the following appear in the log:
+        <p></p>
+        <div class="codeBlock">
+          [31/Dec/2015 11:06:08]: 192.168.2.105 ==> "GET / HTTP/1.1" 200 -
+          <br \>
+            &emsp;&emsp;&emsp;==> MacOS Macintosh X 10.11.2, Chrome 48.0.2564.48
+          <br \>
+          [31/Dec/2015 11:06:08]: 192.168.2.105 ==> "GET /favicon.ico HTTP/1.1" 200 -
+          <br \>
+	           &emsp;&emsp;&emsp;==> MacOS Macintosh X 10.11.2, Chrome 48.0.2564.48
+        </div>
+        <p></p>
+        In the example above, you can see two requests coming from a machine at 192.168.2.105, one made for the root (index.html) and a favicon. Since [setup] > detailed is True by default, you also see information about the browser and operating system where the request originates. In this case, the requests were made from a Mac running Chrome.
+        <p></p>
+        With no index.html file in your webroot folder (signified by 3 above), you'll be greeted with the following:
+        <p></p>
+        <img src="img/noindex.png"/>
+        Once you place an index file in your webroot, it will be loaded. Of course, you can go without an index and navigate directly to other files stored in your webroot.
+        <p></p>
+        <span class="midHeading">Stopping</span>
+        <p></p>
+        To stop ssp, simply press Ctrl-C. When you do this, you'll be told how long your server was running.
+    </div>
+
+    <p class="largeSpacer"></p>
+    <span class="topHeading" id="stats">Statistics: ssp_stats</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
+    <p></p>
+    <div>
+      Built into the functionality of ssp is statistics tracking. As of now, browser, os and request counts are logged. These stats can be accessed by running the ssp_stats.py script:
+      <p></p>
+      <div class="codeBlock">
+        <span class="codePrompt">$</span>python ssp_stats.py
+      </div>
+      <p></p>
+      When you run this, you will see something similar to the following:
+      <p></p>
+      <div class="codeBlock">
+        :: Statistics for ssp
+        <br \>
+         &emsp;&emsp;&emsp;:: browser_Chrome_48.0.2564.48=6
+         <br \>
+         &emsp;&emsp;&emsp;:: browser_Firefox_44.0=4
+         <br \>
+         &emsp;&emsp;&emsp;:: browser_Unknown_Browser=1
+         <br \>
+         &emsp;&emsp;&emsp;:: os_MacOS_Macintosh_X_10.11=4
+         <br \>
+         &emsp;&emsp;&emsp;:: os_MacOS_Macintosh_X_10.11.2=6
+         <br \>
+         &emsp;&emsp;&emsp;:: os_Unknown_OS=1
+         <br \>
+         &emsp;&emsp;&emsp;:: requests=11
+         <br \>
+         &emsp;&emsp;&emsp;:: requests_2015_12_28=4
+         <br \>
+         &emsp;&emsp;&emsp;:: requests_2015_12_31=7
+      </div>
+      <p></p>
+      You can also use the following switches to export the data as either a comma seperated values file or a visualized form of the stats in graph form in a HTML document.
+      <p></p>
+      <div class="codeBlock">
+        <ul>
+          <li><span class="codePrompt">export_csv</span>-export the stats as a csv file.</li>
+          <li><span class="codePrompt">export_html<sup>1</sup></span>-export the stats as a graph in a HTML file.</li>
+        </ul>
+      </div>
+      <p></p>
+      <sup>1</sup> The graph in the HTML document depends on external APIs so a connection to the Internet is required to view the graph (although it is not required to generate the graph).
+      <p></p>
+      <span class="lowHeading">export_csv</span>
+      <p></p>
+      The csv output looks similar to the following:
+      <p></p>
+      <div class="codeBlock">
+        key, value
+        <br \>
+        browser_Chrome_48.0.2564.48, 6
+        <br \>
+        browser_Firefox_44.0, 4
+        <br \>
+        browser_Unknown_Browser, 1
+        <br \>
+        os_MacOS_Macintosh_X_10.11, 4
+        <br \>
+        os_MacOS_Macintosh_X_10.11.2, 6
+        <br \>
+        os_Unknown_OS, 1
+        <br \>
+        requests, 11
+        <br \>
+        requests_2015_12_28, 4
+        <br \>
+        requests_2015_12_31, 7
+      </div>
+      <p></p>
+      <span class="lowHeading">export_html</span>
+      <p></p>
+      The html output looks similar to <a href="visual_html.html">this</a>.
+    </div>
   </body>
 </html>

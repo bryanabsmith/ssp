@@ -1,5 +1,3 @@
-# TO DO: reset stats
-
 import anydbm
 import ConfigParser
 import sys
@@ -22,10 +20,10 @@ class ssp_stats():
 
         showDaily = self.config.get("stats", "show_daily_requests")
 
-        visualize = self.config.get("stats", "visual_requests")
         visualize_bars = ""
 
         date_time = time.strftime("%H-%M-%S_%d-%m-%Y")
+        nice_date_time = time.strftime("%d/%m/%Y, %H:%M:%S")
 
         # http://www.tutorialspoint.com/python/python_command_line_arguments.htm
         # if sys.argv[1] == "reset":
@@ -48,53 +46,63 @@ class ssp_stats():
                 output_csv.close()
                 print(" :: Statistics exported to %s/ssp_csv_%s.csv" % (self.config.get("stats", "output_csv"), date_time))
             elif option == "export_html":
-                keyCount = 0
+                browsers = []
+                browsers_value = []
+                browsers_total = 0
+                oses = []
+                oses_value = []
+                oses_total = 0
+                requests = []
+                requests_value = []
+                requests_max = 0
+                requests_total = 0
+
+                for keys in statsDB.keys():
+                    if keys[:7] == "browser":
+                        browsers_total += int(statsDB[keys])
+                    elif keys[:2] == "os":
+                        oses_total += int(statsDB[keys])
+                    elif keys == "requests":
+                        requests_total = statsDB["requests"]
+
                 for keys in sorted(statsDB.keys()):
-                    visualize_bars += "\n                                         [\"%s\", %s]," % (keys, statsDB[keys])
-                    keyCount += 1
-                # https://developers.google.com/chart/interactive/docs/quick_start#how-about-a-bar-chart
-                visualize_html = """
+                    if keys[:7] == "browser":
+                        browsers.append(keys[8:].replace("_", " ") + " (%s, %s%%)" % (statsDB[keys], str(round((float(statsDB[keys])/browsers_total)*100, 2))))
+                        browsers_value.append(int(statsDB[keys]))
+                    elif keys[:2] == "os":
+                        oses.append(keys[3:].replace("_", " ") + " (%s, %s%%)" % (statsDB[keys], str(round((float(statsDB[keys])/oses_total)*100, 2))))
+                        oses_value.append(int(statsDB[keys]))
+                    elif keys[:9] == "requests_":
+                        requests.append(keys[9:].replace("_", "/"))
+                        requests_value.append(int(statsDB[keys]))
+                requests_max = max(requests_value) + 2
+
+                stats_html = """
                     <html>
-                        <head>
-                            <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-                            <script type="text/javascript">
-                                google.load("visualization", "1.0", {"packages":["corechart"]});
-                                google.setOnLoadCallback(drawGraph);
-                                function drawGraph() {
-                                    var data = new google.visualization.DataTable();
-                                    data.addColumn("string", "requests");
-                                    data.addColumn("number", "Requests");
-
-                                    data.addRows([
-                                        %s
-                                    ]);
-
-                                    // http://stackoverflow.com/a/10249847
-                                    var options = {
-                                        "title": "Number of Requests by Date, Browser and OS",
-                                        "width": 1000,
-                                        "height": %i,
-                                        chartArea: {
-                                            top: 50,
-                                            left: 400,
-                                            width: 1000
-                                        }
-                                    };
-
-                                    var chart = new google.visualization.BarChart(document.getElementById("chart_div"));
-                                    chart.draw(data, options);
-                                }
-                            </script>
-                        </head>
-                        <body>
-                            <div id="chart_div"></div>
-                        </body>
+                      <head>
+                        <link rel='stylesheet' href='http://cdn.jsdelivr.net/chartist.js/latest/chartist.min.css'>
+                        <link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+                        <script src='http://cdn.jsdelivr.net/chartist.js/latest/chartist.min.js'></script>
+                        <style>body {background-color: #F2F2F0; font-family: 'Raleway', sans-serif; margin: 5%%;}</style>
+                      </head>
+                      <body>
+                        <h1>ssp Statistics (%s)</h1>
+                        <h3>Browser</h3><div id='chartBrowser' class='ct-chart ct-perfect-fourth'></div><p></p>
+                        <h3>Operating Systems</h3><div id='chartOS' class='ct-chart ct-perfect-fourth'></div><p></p>
+                        <h3>Requests (%s total)</h3><div id='chartRequests' class='ct-chart ct-perfect-fourth'></div>
+                        <script>
+                          new Chartist.Pie('#chartBrowser', {labels: %s, series: %s}, {donut: true, donutWidth: 50, startAngle: 0, total: 0, showLabel: true, chartPadding: 100, labelOffset: 50, labelDirection: 'explode'});
+                          new Chartist.Pie('#chartOS', {labels: %s, series: %s}, {donut: true, donutWidth: 50, startAngle: 0, total: 0, showLabel: true, chartPadding: 100, labelOffset: 50, labelDirection: 'explode'});
+                          new Chartist.Line('#chartRequests', {labels: %s, series: [%s]}, {high: %i, low: 0, showArea: true});
+                        </script>
+                      </body>
                     </html>
-                """ % (visualize_bars[:-1], keyCount*75) # http://stackoverflow.com/a/15478161
-                f = open("%s/visualize_html_%s.html" % (self.config.get("stats", "output_html"), date_time), "w")
-                f.writelines(visualize_html)
+                """ % (nice_date_time, requests_total, browsers, browsers_value, oses, oses_value, requests, requests_value, int(requests_max))
+
+                f = open("%s/ssp_html_%s.html" % (self.config.get("stats", "output_html"), date_time), "w")
+                f.writelines(stats_html)
                 f.close()
-                print(" :: Statistics exported to %s/visualize_html_%s.html" % (self.config.get("stats", "output_html"), date_time))
+                print(" :: Statistics exported to %s/ssp_html_%s.html" % (self.config.get("stats", "output_html"), date_time))
             else:
                 print(" :: Invalid option. Possible options:\n     :: export_csv - Export the keys and values to a csv file.\n     :: export_html - Export the keys and values to a html file.")
         except IndexError:

@@ -151,10 +151,10 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 				if os.path.isfile("%s/index.html" % docroot_dir) == False:
 					# This loads the default index file that the user configures.
 					try:
-						default_page = open("html/default_index.html", "r")
+						default_page = open("webroot/default_index.html", "r")
 						page = default_page.read()
 						page = page.replace("&version&", SSP_VERSION)
-						page = page.replace("&docroot&", docroot_dir)
+						page = page.replace("&webroot&", docroot_dir)
 						page = page.replace("&platform&", platformName)
 						self.wfile.write(page)
 						default_page.close()
