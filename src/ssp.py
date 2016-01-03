@@ -46,7 +46,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 		# Check to see if the user wants detailed logging.
 		if DETAILED == "True":
 			# Print log messages based on the response code. Each time a request is sent to the server, it responds with a three digit code.
-			print("\033[1;32;40m[RQ]\033[0m (%s): %s ==> %s" % (self.log_date_time_string(), self.client_address[0], format%args))
+			print("\033[0;32;40m[RQ]\033[0m (%s): %s ==> %s" % (self.log_date_time_string(), self.client_address[0], format%args))
 			logging.info("[RQ] (%s): %s ==> %s" % (self.log_date_time_string(), self.client_address[0], format%args))
 		else:
 			# The codes are stored in the second argument of the args array that includes response log messages.
@@ -101,7 +101,10 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
 		# Check to see if the user wants detailed logging.
 		if CLIENTINFO == "True":
-			cInfo = "	\033[1;36;40m[CL]\033[0m %s, %s" % (osHeader.replace("_", " "), browserHeader.replace("_", " "))
+			if PLAT == "Windows":
+				cInfo = "	[CL] %s, %s" % (osHeader.replace("_", " "), browserHeader.replace("_", " "))
+			else:
+				cInfo = "	\033[0;36;40m[CL]\033[0m %s, %s" % (osHeader.replace("_", " "), browserHeader.replace("_", " "))
 			print(cInfo)
 			logging.info(cInfo)
 		# End the headers.
@@ -201,7 +204,10 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 									self.wfile.write(f.read())
 								f.close()
 						else:
-							print("	\033[1;31;40m[ER]\033[0m %s (%s)" % (e.strerror, self.path))
+							if PLAT == "Windows":
+								print("	[ER] %s (%s)" % (e.strerror, self.path))
+							else:
+								print("	\033[0;31;40m[ER]\033[0m %s (%s)" % (e.strerror, self.path))
 							logging.error("Error: %s (%s)" % (e.strerror, self.path))
 
 							page404 = self.config.get("content", "custom404")
@@ -340,15 +346,17 @@ class sspserver():
 				else:
 					print("	==> Serving out of " + DOCROOT)
 				'''
-				print("ssp/%s\n\033[1;33;40m[Host]\033[0m    http://%s:%s\n\033[1;33;40m[WebRoot]\033[0m %s" % (SSP_VERSION, str(IP), str(PORT), DOCROOT))
+				if PLAT == "Windows":
+					print("ssp/%s\n[Host]    http://%s:%s\n[WebRoot] %s" % (SSP_VERSION, str(IP), str(PORT), DOCROOT))
+				else:
+					print("ssp/%s\n\033[0;33;40m[Host]\033[0m    http://%s:%s\n\033[0;33;40m[WebRoot]\033[0m %s" % (SSP_VERSION, str(IP), str(PORT), DOCROOT))
 
 				print("\nLog:")
 
 				# Serve content "forever" until a KeyBoardInterrupt is issued (Control-C).
 				httpd.serve_forever()
-			except socket.error as e:
-				if e == "48":
-					print("Socket in use on this port. Clear the socket and try again.")
+			except socket.error:
+				print("Socket in use on this port. Clear the socket and try again.")
 		except KeyboardInterrupt:
 			# self.statsDB.close()
 			# http://stackoverflow.com/a/1557584
@@ -358,7 +366,10 @@ class sspserver():
 			minutes, seconds = divmod(runTime, 60)
 			hours, minutes = divmod(minutes, 60)
 			runTime = "Run Time: %d:%02d:%02d" % (hours, minutes, seconds)
-			print "Closing ssp...\n\n%s" % runTime
+			if PLAT == "Windows":
+				print("\nClosing ssp...\n%s" % runTime)
+			else:
+				print("\n\033[0;35;40mClosing ssp...\n%s\033[0m" % runTime)
 			logging.info(runTime)
 			# If Control-C is pressed, kill the server.
 			sys.exit(0)
