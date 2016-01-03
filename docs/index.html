@@ -176,6 +176,12 @@
         # If you use the *nix workaround above, set the network interface here.
         <br \>
         <span class="codePrompt">nix_interface=en1</span>
+        <p></p>
+        # Set this to True to have your external IP reported back at startup.
+        <br \>
+        # NOTE: MyExternalIP limits requests to 30/minute so don't restart the server with this set to True more than 30 times per minute (would you even be doing that anyway?).
+        <br \>
+        <span class="codePrompt">useExternalIP=False</span>
       </div>
     </div>
     <p></p>

@@ -13,6 +13,7 @@ import httpagentparser
 import logging
 import os
 import platform
+import requests
 import SimpleHTTPServer
 import SocketServer
 import socket
@@ -45,8 +46,8 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 		# Check to see if the user wants detailed logging.
 		if DETAILED == "True":
 			# Print log messages based on the response code. Each time a request is sent to the server, it responds with a three digit code.
-			print("[%s]: %s ==> %s" % (self.log_date_time_string(), self.client_address[0], format%args))
-			logging.info("[%s]: %s ==> %s" % (self.log_date_time_string(), self.client_address[0], format%args))
+			print("\033[1;32;40m[RQ]\033[0m (%s): %s ==> %s" % (self.log_date_time_string(), self.client_address[0], format%args))
+			logging.info("[RQ] (%s): %s ==> %s" % (self.log_date_time_string(), self.client_address[0], format%args))
 		else:
 			# The codes are stored in the second argument of the args array that includes response log messages.
 			code = args[1]
@@ -60,7 +61,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
 			#if code == "200":
 				#code = "OK (200)"
-			print("[%s]: %s" % (self.log_date_time_string(), httpCodes[code]))
+			print("\033[1;32;40m[RQ]\033[0m (%s): %s" % (self.log_date_time_string(), httpCodes[code]))
 
 	# https://wiki.python.org/moin/BaseHttpServer
 	def do_HEAD(self):
@@ -100,7 +101,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
 		# Check to see if the user wants detailed logging.
 		if CLIENTINFO == "True":
-			cInfo = "	==> %s, %s" % (osHeader.replace("_", " "), browserHeader.replace("_", " "))
+			cInfo = "	\033[1;36;40m[CL]\033[0m %s, %s" % (osHeader.replace("_", " "), browserHeader.replace("_", " "))
 			print(cInfo)
 			logging.info(cInfo)
 		# End the headers.
@@ -200,7 +201,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 									self.wfile.write(f.read())
 								f.close()
 						else:
-							print("	=> Error: %s (%s)" % (e.strerror, self.path))
+							print("	\033[1;31;40m[ER]\033[0m %s (%s)" % (e.strerror, self.path))
 							logging.error("Error: %s (%s)" % (e.strerror, self.path))
 
 							page404 = self.config.get("content", "custom404")
@@ -288,49 +289,66 @@ class sspserver():
 		#useFreeBSDComplex = self.config.get("setup", "use_freebsd_ip_workaround")
 
 		if platform.system() == "FreeBSD" or PLAT.find("linux") > -1 and useNixComplex == "False":
-			print("It appears that you're running on FreeBSD and don't have 'use_freebsd_ip_workaround' set to True. Please make sure to set this to True to and set 'fbsd_interface' to the interface that you're serving off of.\n\n")
+			print("It appears that you're running on FreeBSD or Linux and don't have 'use_nix_ip_workaround' set to True. Please make sure to set this to True to and set 'nix_interface' to the interface that you're serving off of.\n\n")
 
-		if useNixComplex == "True":
-			import netifaces
-			interface = self.config.get("setup", "nix_interface")
-			IP = netifaces.ifaddresses(interface)[2][0]["addr"]
+		useExternalIP = self.config.get("setup", "useExternalIP")
+
+		if useExternalIP == "True":
+			# http://myexternalip.com/#python-request
+			externalURL = "http://www.myexternalip.com/raw"
+			req = requests.get(externalURL)
+			IP = req.text.strip("\n")
 		else:
-			try:
+			if useNixComplex == "True":
+				import netifaces
+				interface = self.config.get("setup", "nix_interface")
+				try:
+					IP = netifaces.ifaddresses(interface)[2][0]["addr"]
+				except ValueError:
+					print("It would appear that the interface that you've set for nix_interface is incorrect. Please double check and try launching ssp again.")
+			else:
+				try:
 
-				# Thank to http://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib for the IP tips.
-				if usehost == "False":
-					IP = socket.gethostbyname(socket.getfqdn())
-				else:
-					IP = socket.gethostbyname(socket.gethostname())
-			except socket.gaierror:
-				IP = "ERROR GETTING IP"
+					# Thank to http://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib for the IP tips.
+					if usehost == "False":
+						IP = socket.gethostbyname(socket.getfqdn())
+					else:
+						IP = socket.gethostbyname(socket.gethostname())
+				except socket.gaierror:
+					IP = "ERROR GETTING IP"
 
 		try:
 			# Set up the http handler. This does the "grunt" work. The more fine grained details are handled in the SSPHTTPHandler class.
 			Handler = SSPHTTPHandler
 
-			# This creates a tcp server using the Handler. As I understand it, this creates a standard TCP server and then handles connections to it using the SSPHTTPHandler class.
-			httpd = SocketServer.TCPServer(("", PORT), Handler)
+			try:
+				# This creates a tcp server using the Handler. As I understand it, this creates a standard TCP server and then handles connections to it using the SSPHTTPHandler class.
+				httpd = SocketServer.TCPServer(("", PORT), Handler)
+				'''
+				# Print the version of ssp.
+				print("=> ssp/" + SSP_VERSION + " running on " + PLAT)
 
-			# Print the version of ssp.
-			print("=> ssp/" + SSP_VERSION + " running on " + PLAT)
+				# Print the port that the server will pipe content through.
+				print("	==> Serving on port " + str(PORT))
 
-			# Print the port that the server will pipe content through.
-			print("	==> Serving on port " + str(PORT))
+				# Print the IP address of the server.
+				print("	==> Serving on IP " + str(IP))
 
-			# Print the IP address of the server.
-			print("	==> Serving on IP " + str(IP))
+				# If the document root config option is set to ., serve content out of the current working directory.
+				if DOCROOT == ".":
+					print("	==> Serving out of " + os.getcwd())
+				else:
+					print("	==> Serving out of " + DOCROOT)
+				'''
+				print("ssp/%s\n\033[1;33;40m[Host]\033[0m    http://%s:%s\n\033[1;33;40m[WebRoot]\033[0m %s" % (SSP_VERSION, str(IP), str(PORT), DOCROOT))
 
-			# If the document root config option is set to ., serve content out of the current working directory.
-			if DOCROOT == ".":
-				print("	==> Serving out of " + os.getcwd())
-			else:
-				print("	==> Serving out of " + DOCROOT)
+				print("\nLog:")
 
-			print("\nLog:")
-
-			# Serve content "forever" until a KeyBoardInterrupt is issued (Control-C).
-			httpd.serve_forever()
+				# Serve content "forever" until a KeyBoardInterrupt is issued (Control-C).
+				httpd.serve_forever()
+			except socket.error as e:
+				if e == "48":
+					print("Socket in use on this port. Clear the socket and try again.")
 		except KeyboardInterrupt:
 			# self.statsDB.close()
 			# http://stackoverflow.com/a/1557584

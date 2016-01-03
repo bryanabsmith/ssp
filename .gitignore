@@ -4,3 +4,5 @@ ssp.log
 *.db
 
 visualize.html
+
+ssp_html*
