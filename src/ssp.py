@@ -13,7 +13,12 @@ import httpagentparser
 import logging
 import os
 import platform
-import requests
+
+try:
+	import requests
+except ImportError:
+	print("python-requests isn't installed. This won't affect your use of ssp unless you have [setup] > useExternalIP set to True.")
+
 import SimpleHTTPServer
 import SocketServer
 import socket
@@ -45,8 +50,11 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
 		# Check to see if the user wants detailed logging.
 		if DETAILED == "True":
-			# Print log messages based on the response code. Each time a request is sent to the server, it responds with a three digit code.
-			print("\033[0;32;40m[RQ]\033[0m (%s): %s ==> %s" % (self.log_date_time_string(), self.client_address[0], format%args))
+			if PLAT == "Windows":
+				print("[RQ] (%s): %s ==> %s" % (self.log_date_time_string(), self.client_address[0], format%args))
+			else:
+				# Print log messages based on the response code. Each time a request is sent to the server, it responds with a three digit code.
+				print("\033[0;32;40m[RQ]\033[0m (%s): %s ==> %s" % (self.log_date_time_string(), self.client_address[0], format%args))
 			logging.info("[RQ] (%s): %s ==> %s" % (self.log_date_time_string(), self.client_address[0], format%args))
 		else:
 			# The codes are stored in the second argument of the args array that includes response log messages.
@@ -61,7 +69,10 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
 			#if code == "200":
 				#code = "OK (200)"
-			print("\033[1;32;40m[RQ]\033[0m (%s): %s" % (self.log_date_time_string(), httpCodes[code]))
+			if PLAT == "Windows":
+				print("[RQ] (%s): %s" % (self.log_date_time_string(), httpCodes[code]))
+			else:
+				print("\033[1;32;40m[RQ]\033[0m (%s): %s" % (self.log_date_time_string(), httpCodes[code]))
 
 	# https://wiki.python.org/moin/BaseHttpServer
 	def do_HEAD(self):

@@ -1,0 +1,1 @@
+Search.setIndex({envversion:46,filenames:["index"],objects:{},objnames:{},objtypes:{},terms:{bryanabsmith:0,clone:0,com:0,content:[],git:0,github:0,http:0,index:[],modul:[],page:[],repo:0,search:[],thi:0,version:0,you:0},titles:["ssp"],titleterms:{document:[],indic:[],inform:0,ssp:0,tabl:[],welcom:[]}})

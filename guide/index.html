@@ -76,9 +76,9 @@
     <span class="topHeading" id="installSetup">Installing and Setup</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
     <p></p>
     <div>
-      ssp works on Windows, OS X, Linux and FreeBSD<sup>1</sup>.
-      <p></p>
-      <sup>1</sup> FreeBSD support is, let's say, "beta" as the OS has some idiosyncrasies that don't exist with Windows/OS X/Linux.
+      ssp works on Windows, OS X, Linux and FreeBSD.
+      <!--<p></p>
+      <sup>1</sup> FreeBSD support is, let's say, "beta" as the OS has some idiosyncrasies that don't exist with Windows/OS X/Linux.-->
       <p class="smallSpacer"></p>
       <span class="midHeading">Supported OSes</span>
       <p></p>
@@ -98,7 +98,11 @@
       <p></p>
       <ul>
         <li>If you run the source version, you'll need Python 2. Please note that Python 2 is an absolute requirement as Python 3 is not (yet) supported.</li>
-        <li>python-netifaces (if you run the source version)</li>
+        <li>Python libraries:</li>
+          <ul>
+            <li>netifaces (if you run ssp on Linux or FreeBSD)</li>
+            <li>requests (if you need ssp to report back your external IP)</li>
+          </ul>
       </ul>
       <br \>
       <span class="midHeading">Installing</span>
@@ -113,10 +117,10 @@
       <p></p>
       This will download the ssp source code which can be run as-is - no compilation necessary. This isn't to say that everything is good to go out of the box as you will want to configure ssp before running it (see <a href="#configure">Configuring: ssp.config</a>).
       <p></p>
-      Once you've got the source, simply change into the directory with ssp:
+      Once you've got the source, simply change into the directory with the ssp source:
       <p></p>
       <div class="codeBlock">
-        <span class="codePrompt">$</span>cd ssp/
+        <span class="codePrompt">$</span>cd ssp/src/
       </div>
       <p></p>
       And execute the ssp Python script:
@@ -185,7 +189,7 @@
       </div>
     </div>
     <p></p>
-    Use this section to set default values for basic functionality. This is also the section to set OS specific values. For example, Linux machines may require a workaround to get the IP displayed when started and FreeBSD will most definitely need the workaround (use_nix_ip_workaround and nix_interface preferences) set (at least on 10.2) and will require you to set the network interface that you'll be serving on.
+    Use this section to set default values for basic functionality. This is also the section to set OS specific values. For example, Linux machines may require a workaround to get the IP displayed when started and FreeBSD will most definitely need the workaround set (at least on 10.2) and will require you to set the network interface that you'll be serving on (use_nix_ip_workaround and nix_interface preferences).
     <p></p>
     <span class="lowHeading">[content]</span>
     <p></p>
@@ -227,7 +231,7 @@
       <span class="codePrompt">timeout=5</span>
     </div>
     <p></p>
-    This section outlines whether or not you want to redirect users to a different location. Note: this is an "all or nothing" situation; use this only if you've move hosts.
+    This section outlines whether or not you want to redirect users to a different location. Note: this is an "all or nothing" situation; use this only if you've moved hosts or just want to direct people elsewhere.
 
     <p></p>
     <span class="lowHeading">[stats]</span>
@@ -262,7 +266,7 @@
     <span class="topHeading" id="using">Using</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
     <p></p>
     <div>
-        ssp is a simple Python script that can be executed like so:
+        Once you've got everything configured, you can start serving content. ssp is a simple Python script so it can be executed like so:
         <p></p>
         <div class="codeBlock">
           <span class="codePrompt">$</span>python ssp.py
@@ -271,18 +275,16 @@
         Once you do that, you'll see something similar to the following:
         <p></p>
         <div class="codeBlock">
-          => ssp/0.1 running on darwin
+          ssp/0.1
           <br \>
-            &emsp;&emsp;&emsp;==> Serving on port 8888<span class="codePrompt"><sup>1</sup></span>
-            <br \>
-            &emsp;&emsp;&emsp;==> Serving on IP 192.168.2.105<span class="codePrompt"><sup>2</sup></span>
-            <br \>
-            &emsp;&emsp;&emsp;==> Serving out of webroot/<span class="codePrompt"><sup>3</sup></span>
+          <span style="color: #8d8b00;">[Host]</span>    http://192.168.2.105:8888
+          <br \>
+          <span style="color: #8d8b00;">[WebRoot]</span> webroot/
           <p></p>
           Log:
         </div>
         <p></p>
-        At this point, you can navigate to the URL <span style="font-style: italic;">http://1:2</span> from above, so, in this case, http://192.168.2.105:8888.
+        At this point, you can navigate to the URL <span style="font-style: italic;">http://192.168.2.105:8888</span> from above.
         <p></p>
         If you need a quick test on a system without X/UI and you have cURL available to you, execute the following (replace IP as appropriate):
         <p></p>
@@ -295,25 +297,44 @@
         When you navigate to that page from a web browser, you'll see the following appear in the log:
         <p></p>
         <div class="codeBlock">
-          [31/Dec/2015 11:06:08]: 192.168.2.105 ==> "GET / HTTP/1.1" 200 -
+          <span style="color: #159C04;">[RQ]</span> (03/Jan/2016 18:31:37): 192.168.2.105 ==> "GET / HTTP/1.1" 200 -
           <br \>
-            &emsp;&emsp;&emsp;==> MacOS Macintosh X 10.11.2, Chrome 48.0.2564.48
+          &emsp;&emsp;&emsp;<span style="color: #159997;">[CL]</span> MacOS Macintosh X 10.11.2, Chrome 48.0.2564.48
           <br \>
-          [31/Dec/2015 11:06:08]: 192.168.2.105 ==> "GET /favicon.ico HTTP/1.1" 200 -
+          <span style="color: #159C04;">[RQ]</span> (03/Jan/2016 18:31:37): 192.168.2.105 ==> "GET /favicon.ico HTTP/1.1" 200 -
           <br \>
-	           &emsp;&emsp;&emsp;==> MacOS Macintosh X 10.11.2, Chrome 48.0.2564.48
+	        &emsp;&emsp;&emsp;<span style="color: #159997;">[CL]</span> MacOS Macintosh X 10.11.2, Chrome 48.0.2564.48
         </div>
         <p></p>
-        In the example above, you can see two requests coming from a machine at 192.168.2.105, one made for the root (index.html) and a favicon. Since [setup] > detailed is True by default, you also see information about the browser and operating system where the request originates. In this case, the requests were made from a Mac running Chrome.
+        In the example above, you can see two requests (<span style="color: #159C04;">[RQ]</span>) coming from a machine at 192.168.2.105, one made for the root (index.html) and a favicon. Since [setup] > detailed is True by default, you also see information about the browser and operating system where the request originates (<span style="color: #159997;">[CL]</span>). In this case, the requests were made from a Mac running Chrome.
         <p></p>
-        With no index.html file in your webroot folder (signified by 3 above), you'll be greeted with the following:
+        With no index.html file in your webroot folder, you'll be greeted with the following:
         <p></p>
         <img src="img/noindex.png"/>
+        <br \>
         Once you place an index file in your webroot, it will be loaded. Of course, you can go without an index and navigate directly to other files stored in your webroot.
         <p></p>
         <span class="midHeading">Stopping</span>
         <p></p>
-        To stop ssp, simply press Ctrl-C. When you do this, you'll be told how long your server was running.
+        To stop ssp, simply press Ctrl-C. When you do this, you'll be told how long your server was running:
+        <p></p>
+        <div class="codeBlock">
+          <span style="color: #ae0571;">
+            Closing ssp...
+            <br \>
+            Run Time: 0:05:39
+          </span>
+        </div>
+        <p></p>
+        <span class="midHeading">Log</span>
+        <p></p>
+        Here is a "legend" for the differen types of codes you'll see before each line in your log:
+        <p></p>
+        <span style="color: #159C04;">[RQ]</span> - Requests made by client to ssp.
+        <br \>
+        <span style="color: #159997;">[CL]</span> - Client information for each request.
+        <br \>
+        <span style="color: #950003">[ER]</span> - Errors in the requests made (eg. 404s).
     </div>
 
     <p class="largeSpacer"></p>
@@ -354,8 +375,8 @@
       <p></p>
       <div class="codeBlock">
         <ul>
-          <li><span class="codePrompt">export_csv</span>-export the stats as a csv file.</li>
-          <li><span class="codePrompt">export_html<sup>1</sup></span>-export the stats as a graph in a HTML file.</li>
+          <li><span class="codePrompt">export_csv</span>- export the stats as a csv file.</li>
+          <li><span class="codePrompt">export_html<sup>1</sup></span>- export the stats as a graph in a HTML file.</li>
         </ul>
       </div>
       <p></p>
