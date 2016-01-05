@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>ssp &mdash; ssp 0.1 documentation</title>
+    <title>About &mdash; ssp 0.1 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -36,15 +36,37 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="ssp">
-<span id="ssp"></span><h1>ssp<a class="headerlink" href="#ssp" title="Permalink to this headline">¶</a></h1>
-<p><img alt="ssp Screenshot" src="_images/ssp_screenshot.png" /></p>
-<div class="section" id="information">
-<span id="information"></span><h2>Information<a class="headerlink" href="#information" title="Permalink to this headline">¶</a></h2>
-<p><em>Version 0.1</em></p>
+  <div class="section" id="about">
+<span id="about"></span><h1>About<a class="headerlink" href="#about" title="Permalink to this headline">¶</a></h1>
+<p>Version 0.1</p>
+</div>
+<div class="section" id="supported-platforms">
+<span id="supported-platforms"></span><h1>Supported Platforms<a class="headerlink" href="#supported-platforms" title="Permalink to this headline">¶</a></h1>
+<p>|Windows 10|OS X 10.11|Linux|FreeBSD 10.2|
+|&#8212;|&#8212;|&#8212;|&#8212;|</p>
+<p><em>NOTE: This is the list of platform versions that have been tested. It is very possible that it works on other versions and indeed, it likely does.</em></p>
+</div>
+<div class="section" id="getting-the-source">
+<span id="getting-the-source"></span><h1>Getting the Source<a class="headerlink" href="#getting-the-source" title="Permalink to this headline">¶</a></h1>
 <blockquote>
 <div>git clone https://github.com/bryanabsmith/ssp.git</div></blockquote>
 <p>This will clone the repo for you.</p>
+<p>You&#8217;ll also need python-requests and python-netifaces:</p>
+<blockquote>
+<div>pip install requests netifaces</div></blockquote>
+<p>Technically, these are not required if you don&#8217;t need to get your external IP (requests) and/or you don&#8217;t run ssp on Linux or FreeBSD (netifaces).</p>
+</div>
+<div class="section" id="running">
+<span id="running"></span><h1>Running<a class="headerlink" href="#running" title="Permalink to this headline">¶</a></h1>
+<p>Simply execute src/ssp.py to run ssp:</p>
+<blockquote>
+<div>python ssp.py</div></blockquote>
+<p>It&#8217;s likely that the default configuration, outlined in ssp.config, will not work as you want it to out of the box.</p>
+</div>
+<div class="section" id="configuration-options">
+<span id="configuration-options"></span><h1>Configuration Options<a class="headerlink" href="#configuration-options" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="setup">
+<span id="setup"></span><h2>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -56,8 +78,12 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">ssp</a><ul>
-<li><a class="reference internal" href="#information">Information</a></li>
+<li><a class="reference internal" href="#">About</a></li>
+<li><a class="reference internal" href="#supported-platforms">Supported Platforms</a></li>
+<li><a class="reference internal" href="#getting-the-source">Getting the Source</a></li>
+<li><a class="reference internal" href="#running">Running</a></li>
+<li><a class="reference internal" href="#configuration-options">Configuration Options</a><ul>
+<li><a class="reference internal" href="#setup">Setup</a></li>
 </ul>
 </li>
 </ul>
