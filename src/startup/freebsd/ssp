@@ -1,0 +1,16 @@
+#!/bin/sh
+
+. /etc/rc.subr
+
+name="ssp"
+rcvar="ssp_enable"
+start_cmd="${name}_start"
+stop_cmd=":"
+
+ssp_start() {
+  cd /opt/ssp/src/
+  /usr/bin/python ssp.py
+}
+
+load_rc_config $nice
+run_rc_command "$1"
