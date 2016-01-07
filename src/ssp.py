@@ -364,11 +364,17 @@ class sspserver():
 
 				print("\nLog:")
 
-				# Serve content "forever" until a KeyBoardInterrupt is issued (Control-C).
+				# https://forum.omz-software.com/topic/584/stopping-simplehttpserver/2 and https://docs.python.org/2/library/basehttpserver.html#more-examples
 				httpd.serve_forever()
 			except socket.error:
 				print("Socket in use on this port. Clear the socket and try again.")
+				# http://stackoverflow.com/questions/12397175/how-do-i-close-an-open-port-from-the-terminal-on-the-mac
+				print("	On a Unix system, execute the following:")
+				print("		sudo lsof -i :8888")
+				print("		sudo kill -9 <PID>")
+
 		except KeyboardInterrupt:
+
 			# self.statsDB.close()
 			# http://stackoverflow.com/a/1557584
 			runTime = time.time() - startTime
@@ -378,9 +384,9 @@ class sspserver():
 			hours, minutes = divmod(minutes, 60)
 			runTime = "Run Time: %d:%02d:%02d" % (hours, minutes, seconds)
 			if PLAT == "Windows":
-				print("\nClosing ssp...\n%s" % runTime)
+				print("\rClosing ssp...\n%s" % runTime)
 			else:
-				print("\n\033[0;35;40mClosing ssp...\n%s\033[0m" % runTime)
+				print("\r\033[0;35;40mClosing ssp...\n%s\033[0m" % runTime)
 			logging.info(runTime)
 			# If Control-C is pressed, kill the server.
 			sys.exit(0)

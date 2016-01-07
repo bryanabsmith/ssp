@@ -9,10 +9,10 @@ else
   echo ":: Copying contents to /opt/ssp/"
   cp -R * /opt/ssp/
   echo ":: Creating symlinks"
-  ln -s /opt/ssp/ssp.py /usr/bin/ssp
-  ln -s /opt/ssp/ssp_stats.py /usr/bin/ssp_stats
+  ln -s /opt/ssp/src/ssp.py /usr/bin/ssp
+  ln -s /opt/ssp/src/ssp_stats.py /usr/bin/ssp_stats
   echo ":: Fixing permissions"
-  chmod +x /opt/ssp/ssp.py
-  chmod +x /opt/ssp/ssp_stats.py
+  chmod +x /opt/ssp/src/ssp.py
+  chmod +x /opt/ssp/src/ssp_stats.py
   echo "Done"
 fi
