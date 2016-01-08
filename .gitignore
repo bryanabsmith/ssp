@@ -6,3 +6,4 @@ ssp.log
 visualize.html
 
 ssp_html*
+*.pyc
