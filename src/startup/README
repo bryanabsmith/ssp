@@ -22,3 +22,18 @@ To start ssp at boot on a FreeBSD system, do the following:
 3. Add ssp_enable="YES" to /etc/rc.conf.
 
 NOTE: This (3) will block the boot process. I don't know enough about FreeBSD at this point to fix this.
+
+
+Windows
+
+To start ssp at boot on a FreeBSD system, do the following:
+
+1. Copy start_ssp.bat to "C:\Users\{<your username>}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\" (replace {your_username} with your username).
+2. Edit start_ssp.bat as necessary, changing (if need be) the directory to start_ssp.ps1.
+
+This is not the most elegant solution but it works for now.
+
+
+OS X
+
+IN PROGRESS

@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/Library/Frameworks/Python.framework/Versions/2.7/bin/python
+
 
 # When testing, "sudo lsof -i :<port> and sudo kill -9 <PID>" will close the port if you find Python complaining that a port is in use. Courtesy of http://stackoverflow.com/questions/12397175/how-do-i-close-an-open-port-from-the-terminal-on-the-mac
 # If you're testing with the default port of 8888, execute the following to address ""[Errno 48] Address already in use" issues:
@@ -13,12 +14,6 @@ import httpagentparser
 import logging
 import os
 import platform
-
-try:
-	import requests
-except ImportError:
-	print("python-requests isn't installed. This won't affect your use of ssp unless you have [setup] > useExternalIP set to True.")
-
 import SimpleHTTPServer
 import SocketServer
 import socket
@@ -50,7 +45,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
 		# Check to see if the user wants detailed logging.
 		if DETAILED == "True":
-			if PLAT == "Windows":
+			if PLAT == "win32":
 				print("[RQ] (%s): %s ==> %s" % (self.log_date_time_string(), self.client_address[0], format%args))
 			else:
 				# Print log messages based on the response code. Each time a request is sent to the server, it responds with a three digit code.
@@ -69,10 +64,34 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
 			#if code == "200":
 				#code = "OK (200)"
-			if PLAT == "Windows":
+			if PLAT == "win32":
 				print("[RQ] (%s): %s" % (self.log_date_time_string(), httpCodes[code]))
 			else:
 				print("\033[1;32;40m[RQ]\033[0m (%s): %s" % (self.log_date_time_string(), httpCodes[code]))
+
+	def showServerStatus(self):
+		import psutil
+		# https://github.com/giampaolo/psutil
+		mem = (psutil.virtual_memory()[0]/1024)/1024
+		cpu = psutil.cpu_times_percent(interval=1, percpu=False)
+		cpuUser = cpu[0]
+		cpuSystem = cpu[2]
+		cpuIdle = cpu[3]
+		disk = psutil.disk_usage(psutil.disk_partitions()[0][1]) # This only gets the first partition for now.
+		diskTotal = ((disk[0]/1024)/1024)/1024
+		nic = self.config.get("setup", "nix_interface")
+		nicInfo = psutil.net_io_counters(pernic=True)[nic]
+		# http://www.w3.org/TR/WCAG20-TECHS/H76.html - Meta refresh
+		self.wfile.write("""
+			<meta http-equiv="refresh" content="5"/>
+			<h1>Server Status</h1>
+			Memory Total: %s MB<br \>
+			CPU: %s%% (User), %s%% (System), %s%% (Idle)<br \>
+			Disk Total: %s GB<br \>
+			Network Information:
+			<!-- http://www.sitepoint.com/forums/showthread.php?128125-How-can-I-remove-initial-space-at-top-of-list -->
+			<ul style="margin-top:0;"><li>Bytes Sent: %s</li><li>Bytes Recieved: %s</li><li>Packets Sent: %s</li><li>Packets Recieved: %s</li></ul>"""
+			% (str(mem), cpuUser, cpuSystem, cpuIdle, diskTotal, str(nicInfo[0]), str(nicInfo[1]), str(nicInfo[2]), str(nicInfo[3])))
 
 	# https://wiki.python.org/moin/BaseHttpServer
 	def do_HEAD(self):
@@ -112,7 +131,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
 		# Check to see if the user wants detailed logging.
 		if CLIENTINFO == "True":
-			if PLAT == "Windows":
+			if PLAT == "win32":
 				cInfo = "	[CL] %s, %s" % (osHeader.replace("_", " "), browserHeader.replace("_", " "))
 			else:
 				cInfo = "	\033[0;36;40m[CL]\033[0m %s, %s" % (osHeader.replace("_", " "), browserHeader.replace("_", " "))
@@ -154,12 +173,26 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 		redirectValue = self.config.get("redirect", "redirect")
 		redirectURL = self.config.get("redirect", "url")
 		redirectTimeout = self.config.getint("redirect", "timeout")
+		status_enabled = self.config.get("server", "status")
+		status_complex = self.config.get("server", "complex_status")
+		status_complex_path = self.config.get("server", "complex_status_path")
 
 		if redirectValue == "True":
 			self.wfile.write("<h4>Page has moved. Redirecting in %s seconds...</h4>" % str(redirectTimeout))
 			time.sleep(redirectTimeout)
 			# https://css-tricks.com/redirect-web-page/
 			self.wfile.write("<meta http-equiv=\"refresh\" content=\"0; URL='%s'\" />" % redirectURL)
+		elif self.path[:8] == "/sysinfo":
+			if status_enabled == "True":
+				if status_complex == "True":
+					if self.path == "/sysinfo/%s/" % status_complex_path:
+						self.showServerStatus()
+					else:
+						self.wfile.write("Access denied.")
+				else:
+					self.showServerStatus()
+			else:
+				self.wfile.write("Access denied.")
 		else:
 			if self.path == "/":
 				# Check to see if an index.html or index.htm already exists. If it doesn't, use one set by the user in the config file.
@@ -215,7 +248,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 									self.wfile.write(f.read())
 								f.close()
 						else:
-							if PLAT == "Windows":
+							if PLAT == "win32":
 								print("	[ER] %s (%s)" % (e.strerror, self.path))
 							else:
 								print("	\033[0;31;40m[ER]\033[0m %s (%s)" % (e.strerror, self.path))
@@ -313,6 +346,7 @@ class sspserver():
 		if useExternalIP == "True":
 			# http://myexternalip.com/#python-request
 			externalURL = "http://www.myexternalip.com/raw"
+			import requests
 			req = requests.get(externalURL)
 			IP = req.text.strip("\n")
 		else:
@@ -357,7 +391,7 @@ class sspserver():
 				else:
 					print("	==> Serving out of " + DOCROOT)
 				'''
-				if PLAT == "Windows":
+				if PLAT == "win32":
 					print("ssp/%s\n[Host]    http://%s:%s\n[WebRoot] %s" % (SSP_VERSION, str(IP), str(PORT), DOCROOT))
 				else:
 					print("ssp/%s\n\033[0;33;40m[Host]\033[0m    http://%s:%s\n\033[0;33;40m[WebRoot]\033[0m %s" % (SSP_VERSION, str(IP), str(PORT), DOCROOT))
@@ -370,7 +404,7 @@ class sspserver():
 				print("Socket in use on this port. Clear the socket and try again.")
 				# http://stackoverflow.com/questions/12397175/how-do-i-close-an-open-port-from-the-terminal-on-the-mac
 				print("	On a Unix system, execute the following:")
-				print("		sudo lsof -i :8888")
+				print("		sudo lsof -i :<PORT NUMBER>")
 				print("		sudo kill -9 <PID>")
 
 		except KeyboardInterrupt:
@@ -383,7 +417,7 @@ class sspserver():
 			minutes, seconds = divmod(runTime, 60)
 			hours, minutes = divmod(minutes, 60)
 			runTime = "Run Time: %d:%02d:%02d" % (hours, minutes, seconds)
-			if PLAT == "Windows":
+			if PLAT == "win32":
 				print("\rClosing ssp...\n%s" % runTime)
 			else:
 				print("\r\033[0;35;40mClosing ssp...\n%s\033[0m" % runTime)
