@@ -49,7 +49,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 				print("[RQ] (%s): %s ==> %s" % (self.log_date_time_string(), self.client_address[0], format%args))
 			else:
 				# Print log messages based on the response code. Each time a request is sent to the server, it responds with a three digit code.
-				print("\033[0;32;40m[RQ]\033[0m (%s): %s ==> %s" % (self.log_date_time_string(), self.client_address[0], format%args))
+				print("\033[0;32;49m[RQ]\033[0m (%s): %s ==> %s" % (self.log_date_time_string(), self.client_address[0], format%args))
 			logging.info("[RQ] (%s): %s ==> %s" % (self.log_date_time_string(), self.client_address[0], format%args))
 		else:
 			# The codes are stored in the second argument of the args array that includes response log messages.
@@ -67,7 +67,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 			if PLAT == "win32":
 				print("[RQ] (%s): %s" % (self.log_date_time_string(), httpCodes[code]))
 			else:
-				print("\033[1;32;40m[RQ]\033[0m (%s): %s" % (self.log_date_time_string(), httpCodes[code]))
+				print("\033[1;32;49m[RQ]\033[0m (%s): %s" % (self.log_date_time_string(), httpCodes[code]))
 
 	def showServerStatus(self):
 		import psutil
@@ -134,7 +134,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 			if PLAT == "win32":
 				cInfo = "	[CL] %s, %s" % (osHeader.replace("_", " "), browserHeader.replace("_", " "))
 			else:
-				cInfo = "	\033[0;36;40m[CL]\033[0m %s, %s" % (osHeader.replace("_", " "), browserHeader.replace("_", " "))
+				cInfo = "	\033[0;36;49m[CL]\033[0m %s, %s" % (osHeader.replace("_", " "), browserHeader.replace("_", " "))
 			print(cInfo)
 			logging.info(cInfo)
 		# End the headers.
@@ -251,7 +251,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 							if PLAT == "win32":
 								print("	[ER] %s (%s)" % (e.strerror, self.path))
 							else:
-								print("	\033[0;31;40m[ER]\033[0m %s (%s)" % (e.strerror, self.path))
+								print("	\033[0;31;49m[ER]\033[0m %s (%s)" % (e.strerror, self.path))
 							logging.error("Error: %s (%s)" % (e.strerror, self.path))
 
 							page404 = self.config.get("content", "custom404")
@@ -394,7 +394,7 @@ class sspserver():
 				if PLAT == "win32":
 					print("ssp/%s\n[Host]    http://%s:%s\n[WebRoot] %s" % (SSP_VERSION, str(IP), str(PORT), DOCROOT))
 				else:
-					print("ssp/%s\n\033[0;33;40m[Host]\033[0m    http://%s:%s\n\033[0;33;40m[WebRoot]\033[0m %s" % (SSP_VERSION, str(IP), str(PORT), DOCROOT))
+					print("ssp/%s\n\033[0;33;49m[Host]\033[0m    http://%s:%s\n\033[0;33;49m[WebRoot]\033[0m %s" % (SSP_VERSION, str(IP), str(PORT), DOCROOT))
 
 				print("\nLog:")
 
@@ -420,7 +420,7 @@ class sspserver():
 			if PLAT == "win32":
 				print("\rClosing ssp...\n%s" % runTime)
 			else:
-				print("\r\033[0;35;40mClosing ssp...\n%s\033[0m" % runTime)
+				print("\r\033[0;35;49mClosing ssp...\n%s\033[0m" % runTime)
 			logging.info(runTime)
 			# If Control-C is pressed, kill the server.
 			sys.exit(0)
