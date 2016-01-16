@@ -71,6 +71,10 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
     def showServerStatus(self):
         import psutil
+
+        statsDBLocation = self.config.get("stats", "location")
+        statsDB = anydbm.open("%s/ssp_stats.db" % statsDBLocation, "c")
+
         # https://github.com/giampaolo/psutil
         mem = (psutil.virtual_memory()[0]/1024)/1024
         cpu = psutil.cpu_times_percent(interval=1, percpu=False)
@@ -81,17 +85,28 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         diskTotal = ((disk[0]/1024)/1024)/1024
         nic = self.config.get("setup", "nix_interface")
         nicInfo = psutil.net_io_counters(pernic=True)[nic]
+        requestCount = str(statsDB["requests"])
+
+        log = open(LOGFILE, "r")
+        logContents = ""
+        for line in reversed(log.readlines()):
+            logContents += "%s<br \>" % line
+        log.close()
+
         # http://www.w3.org/TR/WCAG20-TECHS/H76.html - Meta refresh
         self.wfile.write("""
             <meta http-equiv="refresh" content="5"/>
-            <h1>Server Status</h1>
+            <h1>Machine Status</h1>
             Memory Total: %s MB<br \>
             CPU: %s%% (User), %s%% (System), %s%% (Idle)<br \>
             Disk Total: %s GB<br \>
             Network Information:
             <!-- http://www.sitepoint.com/forums/showthread.php?128125-How-can-I-remove-initial-space-at-top-of-list -->
-            <ul style="margin-top:0;"><li>Bytes Sent: %s</li><li>Bytes Recieved: %s</li><li>Packets Sent: %s</li><li>Packets Recieved: %s</li></ul>"""
-            % (str(mem), cpuUser, cpuSystem, cpuIdle, diskTotal, str(nicInfo[0]), str(nicInfo[1]), str(nicInfo[2]), str(nicInfo[3])))
+            <ul style="margin-top:0;"><li>Bytes Sent: %s</li><li>Bytes Recieved: %s</li><li>Packets Sent: %s</li><li>Packets Recieved: %s</li></ul>
+            <h1>Server Status</h1>
+            Total Requests: %s<p></p>
+            <h3>Log</h3>%s"""
+            % (str(mem), cpuUser, cpuSystem, cpuIdle, diskTotal, str(nicInfo[0]), str(nicInfo[1]), str(nicInfo[2]), str(nicInfo[3]), requestCount, logContents))
 
     # https://wiki.python.org/moin/BaseHttpServer
     def do_HEAD(self):
@@ -136,7 +151,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             else:
                 cInfo = "	\033[0;36;49m[CL]\033[0m %s, %s" % (osHeader.replace("_", " "), browserHeader.replace("_", " "))
             print(cInfo)
-            logging.info(cInfo)
+            logging.info("	[CL] %s, %s" % (osHeader.replace("_", " "), browserHeader.replace("_", " ")))
         # End the headers.
         self.end_headers()
 
@@ -253,7 +268,6 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                             else:
                                 print("	\033[0;31;49m[ER]\033[0m %s (%s)" % (e.strerror, self.path))
                             logging.error("Error: %s (%s)" % (e.strerror, self.path))
-
                             page404 = self.config.get("content", "custom404")
                             f = open(page404, "r")
                             self.wfile.write(f.read())
