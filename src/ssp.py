@@ -106,7 +106,9 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                 <ul style="margin-top:0;"><li>Bytes Sent: %s</li><li>Bytes Recieved: %s</li><li>Packets Sent: %s</li><li>Packets Recieved: %s</li></ul>
                 <h1>Server Status</h1>
                 Total Requests: %s<p></p>
-                <h3>Log</h3>%s"""
+                <h3>Log</h3>
+                <!-- http://stackoverflow.com/a/9707445 -->
+                <div style="overflow-y: scroll; height:300px;">%s</div>"""
                 % (str(mem), cpuUser, cpuSystem, cpuIdle, diskTotal, str(nicInfo[0]), str(nicInfo[1]), str(nicInfo[2]), str(nicInfo[3]), requestCount, logContents))
         except ImportError:
             self.wfile.write("<h5>psutil module not installed. Please install this first before attempting to see system info.")

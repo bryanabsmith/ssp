@@ -1,111 +1,123 @@
 <html>
   <head>
     <link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     <style>
       /*
-        Color Scheme:
-          - Light Green: 8CDEC7
-          - Medium Green: 73D9B3
-          - Dark Green: 4EA686
-          - White: F2F2F0
-          - Orange: D98E7E
-          Source: https://color.adobe.com/Theme-67-color-theme-7363165/edit/?copy=true&base=2&rule=Custom&selected=4&name=Copy%20of%20Theme%2067&mode=rgb&rgbvalues=0.6,0.9490196078431372,0.8509803921568627,0.4509803921568628,0.8509803921568627,0.7019607843137254,0.3058823529411765,0.6509803921568628,0.5254901960784314,0.9490196078431372,0.9490196078431372,0.9411764705882353,0.8509803921568627,0.5568627450980392,0.4941176470588236&swatchOrder=0,1,2,3,4
+      Color Scheme:
+      - Light Green: 8CDEC7
+      - Medium Green: 73D9B3
+      - Dark Green: 4EA686
+      - White: F2F2F0
+      - Orange: D98E7E
+      Source: https://color.adobe.com/Theme-67-color-theme-7363165/edit/?copy=true&base=2&rule=Custom&selected=4&name=Copy%20of%20Theme%2067&mode=rgb&rgbvalues=0.6,0.9490196078431372,0.8509803921568627,0.4509803921568628,0.8509803921568627,0.7019607843137254,0.3058823529411765,0.6509803921568628,0.5254901960784314,0.9490196078431372,0.9490196078431372,0.9411764705882353,0.8509803921568627,0.5568627450980392,0.4941176470588236&swatchOrder=0,1,2,3,4
       */
 
       body {
-        font-family: 'Raleway', sans-serif;
-        background-color: #F2F2F0;
-        margin: 5%;
+      /*font-family: 'Raleway', sans-serif;*/
+      font-family: 'Roboto', sans-serif;
+      background-color: #F2F2F0;
+      margin: 5%;
       }
 
       a {
-        color: #8CDEC7;
-        text-decoration: none;
+      color: #8CDEC7;
+      text-decoration: none;
+      }
+
+      table {
+      border: 1px solid black;
       }
 
       .topHeading {
-        color: #4EA686;
-        font-size: 15pt;
+      color: #4EA686;
+      font-size: 15pt;
       }
 
       .midHeading {
-        color: #73D9B3;
-        font-size: 13pt;
+      color: #73D9B3;
+      font-size: 13pt;
       }
 
       .lowHeading {
-        color: #D98E7E;
-        font-size: 11pt;
+      color: #D98E7E;
+      font-size: 11pt;
       }
 
       .codePrompt {
-        color: #8CDEC7;
-        padding-right: 0.5em; /* http://stackoverflow.com/a/1571662 */
+      color: #8CDEC7;
+      padding-right: 0.5em; /* http://stackoverflow.com/a/1571662 */
       }
 
       .codeBlock {
-        background-color: #404040;
-        border-radius: 5px;
-        color: #F2F2F0;
-        padding: 20px;
-        width: auto;
+      background-color: #404040;
+      border-radius: 5px;
+      color: #F2F2F0;
+      padding: 20px;
+      width: auto;
       }
       .largeSpacer {
-        height: 50px;
+      height: 50px;
       }
 
       .smallSpacer {
-        height: 10px;
+      height: 10px;
+      }
+
+      /* http://stackoverflow.com/a/1216130 */
+      #leftMainDiv {
+      position: fixed;
+      z-index: 3;
       }
     </style>
   </head>
   <body>
-    <span class="topHeading">ssp</span>, <span class="midHeading">0.1</span>
-    <p class="largeSpacer"></p>
-    <span class="topHeading" style="margin-top: 30%;" id="toc">Table of Contents</span>
-    <ol>
-      <!-- http://stackoverflow.com/a/12386255 -->
-      <li><a href="#installSetup">Installing and Setup</a></li>
-      <li><a href="#configure">Configuring: ssp.config</a></li>
-      <li><a href="#using">Using</a></li>
-      <li><a href="#stats">Statistics: ssp_stats</a></li>
-    </ol>
-    <p class="largeSpacer"></p>
-    <span class="topHeading" id="installSetup">Installing and Setup</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
-    <p></p>
-    <div>
-      ssp works on Windows, OS X, Linux and FreeBSD.
-      <!--<p></p>
-      <sup>1</sup> FreeBSD support is, let's say, "beta" as the OS has some idiosyncrasies that don't exist with Windows/OS X/Linux.-->
+  <div style="width: 100%;">
+    <div id="leftMainDiv" style="float:left; width: 20%">
+      <span class="topHeading">ssp</span>, <span class="midHeading">0.1</span>
       <p class="smallSpacer"></p>
-      <span class="midHeading">Supported OSes</span>
+      <span class="midHeading">News</span>
       <p></p>
-      <span class="lowHeading">Tested</span>
-      <br \>
-      <div style="margin-left: 20px;">
-        <i class="ionicons ion-social-windows"></i> - Windows 10
+      16/01/2016 - <span class="lowHeading">First release</span>
+    </div>
+    <div style="float:left; padding-left: 25%; width: 75%;">
+      <span class="topHeading" style="margin-top: 30%;" id="toc">Table of Contents</span>
+      <ol>
+        <!-- http://stackoverflow.com/a/12386255 -->
+        <li><a href="#installSetup">Installing and Setup</a></li>
+        <li><a href="#configure">Configuring: ssp.config</a></li>
+        <li><a href="#using">Using</a></li>
+        <li><a href="#stats">Statistics: ssp_stats</a></li>
+      </ol>
+
+      <p class="largeSpacer"></p>
+      <span class="topHeading" id="installSetup">Installing and Setup</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
+      <div>
+        ssp works on Windows, OS X, Linux and FreeBSD.
+        <p class="smallSpacer"></p>
+        <span class="midHeading">Supported OSes</span>
+        <p></p>
+        <span class="lowHeading">Tested</span>
         <br \>
-        <i class="ionicons ion-social-apple"></i> - OS X 10.11
-        <br \>
-        <i class="ionicons ion-social-tux"></i> - Linux (tested on CentOS 7)
-        <br \>
-        <i class="ionicons ion-social-freebsd-devil"></i> - FreeBSD 10.2
+        <div style="margin-left: 20px;">
+          <i class="ionicons ion-social-windows"></i> - Windows 10
+          <br \>
+          <i class="ionicons ion-social-apple"></i> - OS X 10.11
+          <br \>
+          <i class="ionicons ion-social-tux"></i> - Linux (tested on CentOS 7)
+          <br \>
+          <i class="ionicons ion-social-freebsd-devil"></i> - FreeBSD 10.2
+        </div>
+        <p class="smallSpacer"></p>
+        <span class="midHeading">Requirements</span>
+        <p></p>
+        <ul>
+          <li>Python 2 (>= 2.7)</li>
+          <li>Python modules: netifaces, requests, psutil</li>
+        </ul>
       </div>
-      <p class="smallSpacer"></p>
-      <span class="midHeading">Requirements</span>
-      <p></p>
-      <ul>
-        <li>If you run the source version, you'll need Python 2. Please note that Python 2 is an absolute requirement as Python 3 is not (yet) supported.</li>
-        <li>Python libraries:</li>
-          <ul>
-            <li>netifaces (if you run ssp on Linux or FreeBSD)</li>
-            <li>requests (if you need ssp to report back your external IP)</li>
-            <li>psutil (if you use the server status functionality)</li>
-          </ul>
-      </ul>
-      <br \>
       <span class="midHeading">Installing</span>
       <p></p>
       <span class="lowHeading">Git</span>
@@ -129,144 +141,142 @@
       <div class="codeBlock">
         <span class="codePrompt">$</span>python ssp.py
       </div>
-    </div>
-
-    <p class="largeSpacer"></p>
-    <span class="topHeading" id="configure">Configure: ssp.config</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
-    <p></p>
-    <div>
-      Before you jump in, you'll want to edit ssp.config.
-      <p class="smallSpacer"></p>
-      <span class="midHeading">ssp.config</span>
-      <br \>
-      To best explore the configuration file, let's look at it one section at a time.
+      <p class="largeSpacer"></p>
+      <span class="topHeading" id="configure">Configure: ssp.config</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
       <p></p>
-      <span class="lowHeading">[setup]</span>
+      <div>
+        Before you jump in, you'll want to edit ssp.config.
+        <p class="smallSpacer"></p>
+        <span class="midHeading">ssp.config</span>
+        <br \>
+        To best explore the configuration file, let's look at it one section at a time.
+        <p></p>
+        <span class="lowHeading">[setup]</span>
+        <p></p>
+        <div class="codeBlock">
+          # This can be any valid port.
+          <br \>
+          # Possible values: 1025-65536
+          <br \>
+          <span class="codePrompt">port=8888</span>
+          <p></p>
+          # Detailed logging information. Do you want to know everything or just a brief overview with each request?
+          <br \>
+          # Possible values: True or False (or anything technically as anything but True is counted as False)
+          <br \>
+          <span class="codePrompt">detailed=True</span>
+          <p></p>
+          # Print out client info to the console when requests are made.
+          <br \>
+          # Possible values: True or False (or anything technically as anything but True is counted as False)
+          <br \>
+          <span class="codePrompt">clientInfo=True</span>
+          <p></p>
+          # Where should content be logged.
+          <br \>
+          <span class="codePrompt">logfile=ssp.log</span>
+          <p></p>
+          # This controls how ssp reports the IP that pages are served from. There are two options, True or False. If set to True (or anything but False), your local host's IP address is returned. If this is False, a fully qualified domain name is returned. If you're unsure as to what you should use, try setting this to True and if you don't see your local IP, set it to False. On some platforms with different host configurations, this may require some trial and error.
+          <br \>
+          <span class="codePrompt">usehostname=True</span>
+          <p></p>
+          # FreeBSD throws an error when getting the IP unless a workaround (netifaces) is used and Linux sometimes doesn't report back the proper interface. Setting this to True makes use of an alternative method to get your local IP.
+          <br \>
+          # NOTE: Using netifaces requires that you have it installed. Execute "pip install netifaces" or use your Linux distribution's or FreeBSD's native netifaces packages (ports: /net/py27-netifaces) if you're running the Python version.
+          <br \>
+          # NOTE 2: While OS X also qualifies as *nix, this workaround isn't needed but can be used.
+          <br \>
+          <span class="codePrompt">use_nix_ip_workaround=False</span>
+          <p></p>
+          # If you use the *nix workaround above, set the network interface here.
+          <br \>
+          <span class="codePrompt">nix_interface=en1</span>
+          <p></p>
+          # Set this to True to have your external IP reported back at startup.
+          <br \>
+          # NOTE: MyExternalIP limits requests to 30/minute so don't restart the server with this set to True more than 30 times per minute (would you even be doing that anyway?).
+          <br \>
+          <span class="codePrompt">useExternalIP=False</span>
+        </div>
+      </div>
+      <p></p>
+      Use this section to set default values for basic functionality. This is also the section to set OS specific values. For example, Linux machines may require a workaround to get the IP displayed when started and FreeBSD will most definitely need the workaround set (at least on 10.2) and will require you to set the network interface that you'll be serving on (use_nix_ip_workaround and nix_interface preferences).
+      <p></p>
+      <span class="lowHeading">[content]</span>
       <p></p>
       <div class="codeBlock">
-        # This can be any valid port.
+        # The docroot (where the server should look for things to serve)
         <br \>
-        # Possible values: 1025-65536
+        # Possible values: a valid directory.
         <br \>
-        <span class="codePrompt">port=8888</span>
+        <span class="codePrompt">docroot=webroot/</span>
         <p></p>
-        # Detailed logging information. Do you want to know everything or just a brief overview with each request?
+        # This inserts a "powered by" string at the bottom.
         <br \>
-        # Possible values: True or False (or anything technically as anything but True is counted as False)
+        # Possible values: true or false.
         <br \>
-        <span class="codePrompt">detailed=True</span>
+        <span class="codePrompt">poweredby=true</span>
         <p></p>
-        # Print out client info to the console when requests are made.
+        # Custom 404 page.
         <br \>
-        # Possible values: True or False (or anything technically as anything but True is counted as False)
-        <br \>
-        <span class="codePrompt">clientInfo=True</span>
-        <p></p>
-        # Where should content be logged.
-        <br \>
-        <span class="codePrompt">logfile=ssp.log</span>
-        <p></p>
-        # This controls how ssp reports the IP that pages are served from. There are two options, True or False. If set to True (or anything but False), your local host's IP address is returned. If this is False, a fully qualified domain name is returned. If you're unsure as to what you should use, try setting this to True and if you don't see your local IP, set it to False. On some platforms with different host configurations, this may require some trial and error.
-        <br \>
-        <span class="codePrompt">usehostname=True</span>
-        <p></p>
-        # FreeBSD throws an error when getting the IP unless a workaround (netifaces) is used and Linux sometimes doesn't report back the proper interface. Setting this to True makes use of an alternative method to get your local IP.
-        <br \>
-        # NOTE: Using netifaces requires that you have it installed. Execute "pip install netifaces" or use your Linux distribution's or FreeBSD's native netifaces packages (ports: /net/py27-netifaces) if you're running the Python version.
-        <br \>
-        # NOTE 2: While OS X also qualifies as *nix, this workaround isn't needed but can be used.
-        <br \>
-        <span class="codePrompt">use_nix_ip_workaround=False</span>
-        <p></p>
-        # If you use the *nix workaround above, set the network interface here.
-        <br \>
-        <span class="codePrompt">nix_interface=en1</span>
-        <p></p>
-        # Set this to True to have your external IP reported back at startup.
-        <br \>
-        # NOTE: MyExternalIP limits requests to 30/minute so don't restart the server with this set to True more than 30 times per minute (would you even be doing that anyway?).
-        <br \>
-        <span class="codePrompt">useExternalIP=False</span>
+        <span class="codePrompt">custom404=webroot/404.html</span>
       </div>
-    </div>
-    <p></p>
-    Use this section to set default values for basic functionality. This is also the section to set OS specific values. For example, Linux machines may require a workaround to get the IP displayed when started and FreeBSD will most definitely need the workaround set (at least on 10.2) and will require you to set the network interface that you'll be serving on (use_nix_ip_workaround and nix_interface preferences).
-    <p></p>
-    <span class="lowHeading">[content]</span>
-    <p></p>
-    <div class="codeBlock">
-      # The docroot (where the server should look for things to serve)
-      <br \>
-      # Possible values: a valid directory.
-      <br \>
-      <span class="codePrompt">docroot=webroot/</span>
       <p></p>
-      # This inserts a "powered by" string at the bottom.
-      <br \>
-      # Possible values: true or false.
-      <br \>
-      <span class="codePrompt">poweredby=true</span>
+      The docroot is the key property here - this is where you'll be serving content out of. You can also add a "Powered by ssp" label to the bottom of each page if you so choose. Finally, you can set a custom 404 page if someone requests a page that doesn't exist.
       <p></p>
-      # Custom 404 page.
-      <br \>
-      <span class="codePrompt">custom404=webroot/404.html</span>
-    </div>
-    <p></p>
-    The docroot is the key property here - this is where you'll be serving content out of. You can also add a "Powered by ssp" label to the bottom of each page if you so choose. Finally, you can set a custom 404 page if someone requests a page that doesn't exist.
-    <p></p>
-    <span class="lowHeading">[redirect]</span>
-    <p></p>
-    <div class="codeBlock">
-      # Redirect to a different page if you've moved hosts or for whatever reason.
-      <br \>
-      # Possible values: True or False
-      <br \>
-      <span class="codePrompt">redirect=False</span>
+      <span class="lowHeading">[redirect]</span>
       <p></p>
-      # The URL to redirect to if 'redirect' is set to True.
-      <br \>
-      <span class="codePrompt">url=http://www.example.com</span>
+      <div class="codeBlock">
+        # Redirect to a different page if you've moved hosts or for whatever reason.
+        <br \>
+        # Possible values: True or False
+        <br \>
+        <span class="codePrompt">redirect=False</span>
+        <p></p>
+        # The URL to redirect to if 'redirect' is set to True.
+        <br \>
+        <span class="codePrompt">url=http://www.example.com</span>
+        <p></p>
+        # Timeout for the redirect
+        <br \>
+        <span class="codePrompt">timeout=5</span>
+      </div>
       <p></p>
-      # Timeout for the redirect
-      <br \>
-      <span class="codePrompt">timeout=5</span>
-    </div>
-    <p></p>
-    This section outlines whether or not you want to redirect users to a different location. Note: this is an "all or nothing" situation; use this only if you've moved hosts or just want to direct people elsewhere.
+      This section outlines whether or not you want to redirect users to a different location. Note: this is an "all or nothing" situation; use this only if you've moved hosts or just want to direct people elsewhere.
 
-    <p></p>
-    <span class="lowHeading">[stats]</span>
-    <p></p>
-    <div class="codeBlock">
-      # The location of the database with statistics info.
-      <br \>
-      # Possible values: a valid directory and file location.
-      <br \>
-      <span class="codePrompt">location=.</span>
       <p></p>
-      # Output location for csv file (if selected as an option).
-      <br \>
-      <span class="codePrompt">output_csv=.</span>
+      <span class="lowHeading">[stats]</span>
       <p></p>
-      # Output location for the html graph file.
-      <br \>
-      <span class="codePrompt">output_html=.</span>
+      <div class="codeBlock">
+        # The location of the database with statistics info.
+        <br \>
+        # Possible values: a valid directory and file location.
+        <br \>
+        <span class="codePrompt">location=.</span>
+        <p></p>
+        # Output location for csv file (if selected as an option).
+        <br \>
+        <span class="codePrompt">output_csv=.</span>
+        <p></p>
+        # Output location for the html graph file.
+        <br \>
+        <span class="codePrompt">output_html=.</span>
+        <p></p>
+        # Show the daily requests. By default, the requests by date are shown which could get overwhelming.
+        <br \>
+        <span class="codePrompt">show_daily_requests=True</span>
+        <!--<p></p>
+        # Show the number of requests in a bar chart.
+        <br \>
+        <span class="codePrompt">visual_requests=True</span>-->
+      </div>
       <p></p>
-      # Show the daily requests. By default, the requests by date are shown which could get overwhelming.
-      <br \>
-      <span class="codePrompt">show_daily_requests=True</span>
-      <!--<p></p>
-      # Show the number of requests in a bar chart.
-      <br \>
-      <span class="codePrompt">visual_requests=True</span>-->
-    </div>
-    <p></p>
-    This section controls the settings for ssp_stats. Much of this is self-explanatory - location and the output_csv and output_html settings control the locations of the stats db and where various types of output ought to be stored. show_daily_requests determines whether or not you see daily activity (which might get overwhelming and/or it might be irrelevant to you).
+      This section controls the settings for ssp_stats. Much of this is self-explanatory - location and the output_csv and output_html settings control the locations of the stats db and where various types of output ought to be stored. show_daily_requests determines whether or not you see daily activity (which might get overwhelming and/or it might be irrelevant to you).
 
-    <p class="largeSpacer"></p>
-    <span class="topHeading" id="using">Using</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
-    <p></p>
-    <div>
+      <p class="largeSpacer"></p>
+      <span class="topHeading" id="using">Using</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
+      <p></p>
+      <div>
         Once you've got everything configured, you can start serving content. ssp is a simple Python script so it can be executed like so:
         <p></p>
         <div class="codeBlock">
@@ -304,7 +314,7 @@
           <br \>
           <span style="color: #159C04;">[RQ]</span> (03/Jan/2016 18:31:37): 192.168.2.105 ==> "GET /favicon.ico HTTP/1.1" 200 -
           <br \>
-	        &emsp;&emsp;&emsp;<span style="color: #159997;">[CL]</span> MacOS Macintosh X 10.11.2, Chrome 48.0.2564.48
+          &emsp;&emsp;&emsp;<span style="color: #159997;">[CL]</span> MacOS Macintosh X 10.11.2, Chrome 48.0.2564.48
         </div>
         <p></p>
         In the example above, you can see two requests (<span style="color: #159C04;">[RQ]</span>) coming from a machine at 192.168.2.105, one made for the root (index.html) and a favicon. Since [setup] > detailed is True by default, you also see information about the browser and operating system where the request originates (<span style="color: #159997;">[CL]</span>). In this case, the requests were made from a Mac running Chrome.
@@ -320,11 +330,11 @@
         To stop ssp, simply press Ctrl-C. When you do this, you'll be told how long your server was running:
         <p></p>
         <div class="codeBlock">
-          <span style="color: #ae0571;">
-            Closing ssp...
-            <br \>
-            Run Time: 0:05:39
-          </span>
+            <span style="color: #ae0571;">
+              Closing ssp...
+              <br \>
+              Run Time: 0:05:39
+            </span>
         </div>
         <p></p>
         <span class="midHeading">Log</span>
@@ -336,82 +346,84 @@
         <span style="color: #159997;">[CL]</span> - Client information for each request.
         <br \>
         <span style="color: #950003">[ER]</span> - Errors in the requests made (eg. 404s).
-    </div>
+      </div>
 
-    <p class="largeSpacer"></p>
-    <span class="topHeading" id="stats">Statistics: ssp_stats</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
-    <p></p>
-    <div>
-      Built into the functionality of ssp is statistics tracking. As of now, browser, os and request counts are logged. These stats can be accessed by running the ssp_stats.py script:
+      <p class="largeSpacer"></p>
+      <span class="topHeading" id="stats">Statistics: ssp_stats</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
       <p></p>
-      <div class="codeBlock">
-        <span class="codePrompt">$</span>python ssp_stats.py
+      <div>
+        Built into the functionality of ssp is statistics tracking. As of now, browser, os and request counts are logged. These stats can be accessed by running the ssp_stats.py script:
+        <p></p>
+        <div class="codeBlock">
+          <span class="codePrompt">$</span>python ssp_stats.py
+        </div>
+        <p></p>
+        When you run this, you will see something similar to the following:
+        <p></p>
+        <div class="codeBlock">
+          :: Statistics for ssp
+          <br \>
+          &emsp;&emsp;&emsp;:: browser_Chrome_48.0.2564.48=6
+          <br \>
+          &emsp;&emsp;&emsp;:: browser_Firefox_44.0=4
+          <br \>
+          &emsp;&emsp;&emsp;:: browser_Unknown_Browser=1
+          <br \>
+          &emsp;&emsp;&emsp;:: os_MacOS_Macintosh_X_10.11=4
+          <br \>
+          &emsp;&emsp;&emsp;:: os_MacOS_Macintosh_X_10.11.2=6
+          <br \>
+          &emsp;&emsp;&emsp;:: os_Unknown_OS=1
+          <br \>
+          &emsp;&emsp;&emsp;:: requests=11
+          <br \>
+          &emsp;&emsp;&emsp;:: requests_2015_12_28=4
+          <br \>
+          &emsp;&emsp;&emsp;:: requests_2015_12_31=7
+        </div>
+        <p></p>
+        You can also use the following switches to export the data as either a comma seperated values file or a visualized form of the stats in graph form in a HTML document.
+        <p></p>
+        <div class="codeBlock">
+          <ul>
+            <li><span class="codePrompt">export_csv</span>- export the stats as a csv file.</li>
+            <li><span class="codePrompt">export_html<sup>1</sup></span>- export the stats as a graph in a HTML file.</li>
+          </ul>
+        </div>
+        <p></p>
+        <sup>1</sup> The graph in the HTML document depends on external APIs so a connection to the Internet is required to view the graph (although it is not required to generate the graph).
+        <p></p>
+        <span class="lowHeading">export_csv</span>
+        <p></p>
+        The csv output looks similar to the following:
+        <p></p>
+        <div class="codeBlock">
+          key, value
+          <br \>
+          browser_Chrome_48.0.2564.48, 6
+          <br \>
+          browser_Firefox_44.0, 4
+          <br \>
+          browser_Unknown_Browser, 1
+          <br \>
+          os_MacOS_Macintosh_X_10.11, 4
+          <br \>
+          os_MacOS_Macintosh_X_10.11.2, 6
+          <br \>
+          os_Unknown_OS, 1
+          <br \>
+          requests, 11
+          <br \>
+          requests_2015_12_28, 4
+          <br \>
+          requests_2015_12_31, 7
+        </div>
+        <p></p>
+        <span class="lowHeading">export_html</span>
+        <p></p>
+        The html output looks similar to <a href="visual_html.html">this</a>.
       </div>
-      <p></p>
-      When you run this, you will see something similar to the following:
-      <p></p>
-      <div class="codeBlock">
-        :: Statistics for ssp
-        <br \>
-         &emsp;&emsp;&emsp;:: browser_Chrome_48.0.2564.48=6
-         <br \>
-         &emsp;&emsp;&emsp;:: browser_Firefox_44.0=4
-         <br \>
-         &emsp;&emsp;&emsp;:: browser_Unknown_Browser=1
-         <br \>
-         &emsp;&emsp;&emsp;:: os_MacOS_Macintosh_X_10.11=4
-         <br \>
-         &emsp;&emsp;&emsp;:: os_MacOS_Macintosh_X_10.11.2=6
-         <br \>
-         &emsp;&emsp;&emsp;:: os_Unknown_OS=1
-         <br \>
-         &emsp;&emsp;&emsp;:: requests=11
-         <br \>
-         &emsp;&emsp;&emsp;:: requests_2015_12_28=4
-         <br \>
-         &emsp;&emsp;&emsp;:: requests_2015_12_31=7
-      </div>
-      <p></p>
-      You can also use the following switches to export the data as either a comma seperated values file or a visualized form of the stats in graph form in a HTML document.
-      <p></p>
-      <div class="codeBlock">
-        <ul>
-          <li><span class="codePrompt">export_csv</span>- export the stats as a csv file.</li>
-          <li><span class="codePrompt">export_html<sup>1</sup></span>- export the stats as a graph in a HTML file.</li>
-        </ul>
-      </div>
-      <p></p>
-      <sup>1</sup> The graph in the HTML document depends on external APIs so a connection to the Internet is required to view the graph (although it is not required to generate the graph).
-      <p></p>
-      <span class="lowHeading">export_csv</span>
-      <p></p>
-      The csv output looks similar to the following:
-      <p></p>
-      <div class="codeBlock">
-        key, value
-        <br \>
-        browser_Chrome_48.0.2564.48, 6
-        <br \>
-        browser_Firefox_44.0, 4
-        <br \>
-        browser_Unknown_Browser, 1
-        <br \>
-        os_MacOS_Macintosh_X_10.11, 4
-        <br \>
-        os_MacOS_Macintosh_X_10.11.2, 6
-        <br \>
-        os_Unknown_OS, 1
-        <br \>
-        requests, 11
-        <br \>
-        requests_2015_12_28, 4
-        <br \>
-        requests_2015_12_31, 7
-      </div>
-      <p></p>
-      <span class="lowHeading">export_html</span>
-      <p></p>
-      The html output looks similar to <a href="visual_html.html">this</a>.
+      <div style="clear:both"></div>
     </div>
   </body>
 </html>
