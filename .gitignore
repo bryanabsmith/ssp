@@ -8,4 +8,4 @@ visualize.html
 ssp_html*
 *.pyc
 
-.idea/
+.idea/*

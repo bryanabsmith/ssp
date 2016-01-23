@@ -62,6 +62,20 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             else:
                 print("\033[1;32;49m[RQ]\033[0m (%s): %s" % (self.log_date_time_string(), httpCodes[code]))
 
+    def getOS(self):
+        platformName = platform.system()
+        if platformName == "Darwin":
+            return "OS X %s" % platform.mac_ver()[0]
+        elif platformName == "Windows":
+            # http://www.deepakg.com/blog/2007/08/using-wmic-for-gathering-system-info/
+            platName = subprocess.Popen("wmic os get name", stdout=subprocess.PIPE, shell=True)
+            winOS = platName.stdout.readlines()[1]
+            winOS = winOS.split("|")
+            #platformName = "Windows %s" % platform.win32_ver()[0]
+            return winOS[0]
+        elif platformName == "Linux":
+            return "%s Linux (%s)" % (platform.linux_distribution()[0].capitalize(), platform.release())
+
     def showServerStatus(self):
         try:
             import psutil
@@ -91,6 +105,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             self.wfile.write("""
                 <meta http-equiv="refresh" content="5"/>
                 <h1>Machine Status</h1>
+                OS: %s<br \>
                 Memory Total: %s MB<br \>
                 CPU: %s%% (User), %s%% (System), %s%% (Idle)<br \>
                 Disk Total: %s GB<br \>
@@ -102,7 +117,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                 <h3>Log</h3>
                 <!-- http://stackoverflow.com/a/9707445 -->
                 <div style="overflow-y: scroll; height:300px;">%s</div>"""
-                % (str(mem), cpuUser, cpuSystem, cpuIdle, diskTotal, str(nicInfo[0]), str(nicInfo[1]), str(nicInfo[2]), str(nicInfo[3]), requestCount, logContents))
+                % (self.getOS(), str(mem), cpuUser, cpuSystem, cpuIdle, diskTotal, str(nicInfo[0]), str(nicInfo[1]), str(nicInfo[2]), str(nicInfo[3]), requestCount, logContents))
         except ImportError:
             self.wfile.write("<h5>psutil module not installed. Please install this first before attempting to see system info.")
 
@@ -169,18 +184,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
         docroot_dir = self.config.get("content", "docroot")
 
-        platformName = platform.system()
-        if platformName == "Darwin":
-            platformName = "OS X %s" % platform.mac_ver()[0]
-        elif platformName == "Windows":
-            # http://www.deepakg.com/blog/2007/08/using-wmic-for-gathering-system-info/
-            platName = subprocess.Popen("wmic os get name", stdout=subprocess.PIPE, shell=True)
-            winOS = platName.stdout.readlines()[1]
-            winOS = winOS.split("|")
-            #platformName = "Windows %s" % platform.win32_ver()[0]
-            platformName = winOS[0]
-        elif platformName == "Linux":
-            platformName = "%s Linux (%s)" % (platform.linux_distribution()[0].capitalize(), platform.release())
+        platformName = self.getOS()
 
         # Create the headers.
         self.do_HEAD()
