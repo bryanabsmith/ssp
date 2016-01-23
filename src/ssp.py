@@ -10,6 +10,7 @@ import platform
 import SimpleHTTPServer
 import SocketServer
 import socket
+import subprocess
 import sys
 import time
 
@@ -172,7 +173,12 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         if platformName == "Darwin":
             platformName = "OS X %s" % platform.mac_ver()[0]
         elif platformName == "Windows":
-            platformName = "Windows %s" % platform.win32_ver()[0]
+            # http://www.deepakg.com/blog/2007/08/using-wmic-for-gathering-system-info/
+            platName = subprocess.Popen("wmic os get name", stdout=subprocess.PIPE, shell=True)
+            winOS = platName.stdout.readlines()[1]
+            winOS = winOS.split("|")
+            #platformName = "Windows %s" % platform.win32_ver()[0]
+            platformName = winOS[0]
         elif platformName == "Linux":
             platformName = "%s Linux (%s)" % (platform.linux_distribution()[0].capitalize(), platform.release())
 
