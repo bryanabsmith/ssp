@@ -273,6 +273,30 @@
       <p></p>
       This section controls the settings for ssp_stats. Much of this is self-explanatory - location and the output_csv and output_html settings control the locations of the stats db and where various types of output ought to be stored. show_daily_requests determines whether or not you see daily activity (which might get overwhelming and/or it might be irrelevant to you).
 
+      <p></p>
+      <span class="lowHeading">[server]</span>
+      <p></p>
+      <div class="codeBlock">
+        # If this is true, you can access server info at /sysinfo.
+        <br \>
+        <span class="codePrompt">status=False</span>
+        <p></p>
+        # If this is true, you set it such that going to /sysinfo wont be enough and you'll need to enter more info (see complex_status_path).
+        <br \>
+        <span class="codePrompt">complex_status=True</span>
+        <p></p>
+        <!-- http://stackoverflow.com/questions/692123/escape-tags-in-html -->
+        # If complex_status is True, you'll need to navigate to /sysinfo/&lt;complex_status_path&gt;/
+        <br \>
+        # NOTE: You'll want to change this.
+        <br \>
+        # NOTE 2: This is by no means a secure way of protecting this data. If you really don't want anyone to see this, don't set status to True.
+        <br \>
+        <span class="codePrompt">complex_status_path=A7h3nskso</span>
+      </div>
+      <p></p>
+      This section sets up and enables the server status section. If you feel the need to monitor the log and system resoure usage remotely, you can enable this. <span style="font-style: italic;">Note: as of right now, this isn't secured or password protected (the best you can do at this point is set a really complex path). Use only if you are comfortable with the possibility of others seeing this info.</span>
+
       <p class="largeSpacer"></p>
       <span class="topHeading" id="using">Using</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
       <p></p>
