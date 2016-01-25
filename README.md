@@ -1,5 +1,5 @@
 # ssp
-Simple web server for the "Summer Server Project."
+Simple Server Project.
 
 [![Build Status](https://travis-ci.org/bryanabsmith/ssp.svg?branch=master)](https://travis-ci.org/bryanabsmith/ssp)
 

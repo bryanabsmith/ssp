@@ -9,5 +9,5 @@ executables = [
 
 setup(name="ssp",
       version="0.1",
-      description="Summer Server Project web server",
+      description="Simple Server Project web server",
       executables=executables)
