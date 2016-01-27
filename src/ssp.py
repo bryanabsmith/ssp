@@ -121,6 +121,54 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         except ImportError:
             self.wfile.write("<h5>psutil module not installed. Please install this first before attempting to see system info.")
 
+    def do_AUTHHEAD(self):
+        # Load the configuration file.
+        self.config.read("ssp.config")
+
+        statsDBLocation = self.config.get("stats", "location")
+        statsDB = anydbm.open("%s/ssp_stats.db" % statsDBLocation, "c")
+
+        auth_key = self.config.get("auth", "auth_key")
+
+        self.send_response(401)
+        self.send_header("WWW-Authenticate", "Basic %s" % auth_key)
+
+        # Set the content to html.
+        self.send_header("Content-type", "text/html")
+
+        # http://b.leppoc.net/2010/02/12/simple-webserver-in-python/
+        headers = self.headers.getheader("User-Agent")
+        #print(libuasparser.browser_search(headers))
+        # http://shon.github.io/httpagentparser/
+        simpleheaders = httpagentparser.simple_detect(headers)
+        #print(simpleheaders)
+
+        osHeader = str(simpleheaders[0].replace(" ", "_"))
+        browserHeader = str(simpleheaders[1].replace(" ", "_"))
+
+        try:
+            statsDB["os_%s" % osHeader] = str(int(statsDB["os_%s" % osHeader]) + 1)
+        except KeyError:
+            statsDB["os_%s" % osHeader] = "1"
+
+        try:
+            statsDB["browser_%s" % browserHeader] = str(int(statsDB["browser_%s" % browserHeader]) + 1)
+        except KeyError:
+            statsDB["browser_%s" % browserHeader] = "1"
+
+        CLIENTINFO = self.config.get("setup", "clientInfo")
+
+        # Check to see if the user wants detailed logging.
+        if CLIENTINFO == "True":
+            if PLAT == "win32":
+                cInfo = "	[CL] %s, %s" % (osHeader.replace("_", " "), browserHeader.replace("_", " "))
+            else:
+                cInfo = "	\033[0;36;49m[CL]\033[0m %s, %s" % (osHeader.replace("_", " "), browserHeader.replace("_", " "))
+            print(cInfo)
+            logging.info("	[CL] %s, %s" % (osHeader.replace("_", " "), browserHeader.replace("_", " ")))
+        # End the headers.
+        self.end_headers()
+
     # https://wiki.python.org/moin/BaseHttpServer
     def do_HEAD(self):
         # Load the configuration file.
@@ -129,7 +177,6 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         statsDBLocation = self.config.get("stats", "location")
         statsDB = anydbm.open("%s/ssp_stats.db" % statsDBLocation, "c")
 
-        # Send a 200 (OK) - request succeeded.
         self.send_response(200)
 
         # Set the content to html.
@@ -170,6 +217,28 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
     # https://wiki.python.org/moin/BaseHttpServer
     def do_GET(self):
+        self.config.read("ssp.config")
+        auth_enabled = self.config.get("auth", "auth_enabled")
+        auth_key = self.config.get("auth", "auth_key")
+
+        # https://gist.github.com/fxsjy/5465353
+        if auth_enabled == "True":
+            if self.headers.getheader("Authorization") == None:
+                self.do_AUTHHEAD()
+                #self.wfile.write("Password not accepted.")
+            elif self.headers.getheader("Authorization") == "Basic %s" % auth_key:
+                self.writeGET()
+                print("Password has been accepted.")
+            else:
+                self.do_AUTHHEAD()
+                print("	\033[0;35;49m[IP]\033[0m Incorrect password entered during authentication.")
+                #print("Not authenticated.") # Mistaken password
+        else:
+            # Create the headers.
+            self.do_HEAD()
+
+    def writeGET(self):
+
         # self.send_response(200)
         # self.send_header("Content-type", "text/html")
         # self.end_headers()
@@ -185,9 +254,6 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         docroot_dir = self.config.get("content", "docroot")
 
         platformName = self.getOS()
-
-        # Create the headers.
-        self.do_HEAD()
 
         # Log that headers were sent
         logging.info("headers")
