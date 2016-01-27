@@ -1,9 +1,11 @@
 <html>
   <head>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.js"></script>
     <link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.css">
     <style>
       /*
       Color Scheme:
@@ -72,6 +74,12 @@
         z-index: 3;
       }
     </style>
+    <script>
+      function encodeString() {
+        // http://stackoverflow.com/questions/11563638/javascript-get-input-text-value, http://stackoverflow.com/questions/1358810/how-do-i-change-the-text-of-a-span-element-in-javascript and https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/atob
+        document.getElementById("encodeOutput").innerHTML = "Your encoded string is <span class='lowHeading'>" + window.btoa(document.getElementById("encodeInput").value) + "</span>.";
+      }
+    </script>
   </head>
   <body>
   <div style="width: 100%;">
@@ -296,6 +304,36 @@
       </div>
       <p></p>
       This section sets up and enables the server status section. If you feel the need to monitor the log and system resoure usage remotely, you can enable this. <span style="font-style: italic;">Note: as of right now, this isn't secured or password protected (the best you can do at this point is set a really complex path). Use only if you are comfortable with the possibility of others seeing this info.</span>
+
+      <p></p>
+      <span class="lowHeading">[auth]</span>
+      <p></p>
+      <div class="codeBlock">
+        # Do you want to password protect your web server?
+        <br \>
+        <span class="codePrompt">auth_enabled=True</span>
+        <p></p>
+        # Password key
+        <br \>
+        # NOTE: Generate one of these ssp_auth_gen.
+        <br \>
+        # NOTE: The default is ssp (user) / ssp (pass). This is what is set as the default below.
+        <br \>
+        <span class="codePrompt">auth_key=c3NwOnNzcA==</span>
+      </div>
+      <p></p>
+      You can set up some basic authentication here. Simply use ssp_auth_gen to generate a base64 encoded string out of a username and password. <span style="font-style: italic;">Note, because this is simply base64 encoded, decoding it is easy (thus making your username and password visible). Try to restrict access to this file if this is a concern.</span>
+      <p></p>
+      Note: You can also set up the base64 encoded string using the tool below.
+      <p></p>
+      <span class="midHeading">Setup Credentials</span>
+      <p></p>
+      <div class="ui action input">
+        <input type="text" id="encodeInput" placeholder="Search...">
+        <button class="ui button" onclick="encodeString();">Encode</button>
+      </div>
+      <p></p>
+      <span id="encodeOutput">Please enter a string above to encode in the format <span style="font-style: italic;">user:pass</span>.</span>
 
       <p class="largeSpacer"></p>
       <span class="topHeading" id="using">Using</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
