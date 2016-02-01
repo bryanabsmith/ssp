@@ -451,9 +451,8 @@ class sspserver():
         # linuxOutbound = self.config.get("setup", "use_linux_ip_outbond_test")
         # useFreeBSDComplex = self.config.get("setup", "use_freebsd_ip_workaround")
 
-        if platform.system() == "FreeBSD" or PLAT.find("linux") > -1 and useNixComplex == "False":
-            print(
-            "It appears that you're running on FreeBSD or Linux and don't have 'use_nix_ip_workaround' set to True. Please make sure to set this to True to and set 'nix_interface' to the interface that you're serving off of.\n\n")
+        #if platform.system() == "FreeBSD" or PLAT.find("linux") > -1 and useNixComplex == "False":
+            #print("It appears that you're running on FreeBSD or Linux and don't have 'use_nix_ip_workaround' set to True. Please make sure to set this to True to and set 'nix_interface' to the interface that you're serving off of.\n\n")
 
         useExternalIP = self.config.get("setup", "useExternalIP")
 
