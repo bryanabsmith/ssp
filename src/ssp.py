@@ -25,7 +25,6 @@ PLAT = sys.platform
 
 # http://stackoverflow.com/a/25375077
 class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
-
     # Set the server version
     SimpleHTTPServer.SimpleHTTPRequestHandler.server_version = SSP_VERSION
 
@@ -35,32 +34,42 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     def log_message(self, format, *args):
         DETAILED = self.config.get("setup", "detailed")
 
+        # The codes are stored in the second argument of the args array that includes response log messages.
+        code = args[1]
+        # 200 is OK - this is what we're looking for.
+
+        httpCodes = {"100": "Continue", "101": "Switching Protocols",
+                     "200": "OK", "201": "Created", "202": "Accepted", "203": "Non-Authoritative Information",
+                     "204": "No Content", "205": "Reset Content", "206": "Partial Content",
+                     "300": "Multiple Choices", "301": "Moved Permanently", "302": "Found", "303": "See Other",
+                     "304": "Not Modified", "305": "Use Proxy", "307": "Temporary Redirect",
+                     "400": "Bad Request", "401": "Unauthorized", "402": "Payment Required", "403": "Forbidden",
+                     "404": "Not Found", "405": "Method Not Allowed", "406": "Not Acceptable",
+                     "407": "Proxy Authentication Required", "408": "Request Timeout", "409": "Conflict", "410": "Gone",
+                     "411": "Length Required", "412": "Precondition Failed", "413": "Request Entity Too Large",
+                     "414": "Request-URI Too Long", "415": "Unsupported Media Type",
+                     "416": "Requested Range Not Satisfiable", "417": "Expectation Failed",
+                     "500": "Internal Server Error", "501": "Not Implemented", "502": "Bad Gateway",
+                     "503": "Service Unavailable", "504": "Gateway Timeout", "505": "HTTP Version Not Supported"}
+
         # Check to see if the user wants detailed logging.
         if DETAILED == "True":
             if PLAT == "win32":
-                print("[RQ] (%s): %s ==> %s" % (self.log_date_time_string(), self.client_address[0], format%args))
+                print("[RQ] (%s): %s ==> %s" % (self.log_date_time_string(), self.client_address[0], format % args))
             else:
                 # Print log messages based on the response code.
                 # Each time a request is sent to the server, it responds with a three digit code.
-                print("\033[0;32;49m[RQ]\033[0m (%s): %s ==> %s" % (self.log_date_time_string(), self.client_address[0], format%args))
-            logging.info("[RQ] (%s): %s ==> %s" % (self.log_date_time_string(), self.client_address[0], format%args))
+                print("\033[0;32;49m[RQ]\033[0m (%s): %s ==> %s" % (
+                self.log_date_time_string(), self.client_address[0], format % args))
+            logging.info("[RQ] (%s): %s ==> %s" % (self.log_date_time_string(), self.client_address[0], format % args))
         else:
-            # The codes are stored in the second argument of the args array that includes response log messages.
-            code = args[1]
-            # 200 is OK - this is what we're looking for.
-
-            httpCodes = {"100": "Continue", "101": "Switching Protocols",
-                         "200": "OK", "201": "Created", "202": "Accepted", "203": "Non-Authoritative Information", "204": "No Content", "205": "Reset Content", "206": "Partial Content",
-                         "300": "Multiple Choices", "301": "Moved Permanently", "302": "Found", "303": "See Other", "304": "Not Modified", "305": "Use Proxy", "307": "Temporary Redirect",
-                         "400": "Bad Request", "401": "Unauthorized", "402": "Payment Required", "403": "Forbidden", "404": "Not Found", "405": "Method Not Allowed", "406": "Not Acceptable", "407": "Proxy Authentication Required", "408": "Request Timeout", "409": "Conflict", "410": "Gone", "411": "Length Required", "412": "Precondition Failed", "413": "Request Entity Too Large", "414": "Request-URI Too Long", "415": "Unsupported Media Type", "416": "Requested Range Not Satisfiable", "417": "Expectation Failed",
-                         "500": "Internal Server Error", "501": "Not Implemented", "502": "Bad Gateway", "503": "Service Unavailable", "504": "Gateway Timeout", "505": "HTTP Version Not Supported"}
-
-            #if code == "200":
-                #code = "OK (200)"
+            # if code == "200":
+            # code = "OK (200)"
             if PLAT == "win32":
-                print("[RQ] (%s): %s" % (self.log_date_time_string(), httpCodes[code]))
+                print("[RQ] (%s): GET %s, %s (%s)" % (self.log_date_time_string(), self.path, code, httpCodes[code]))
             else:
-                print("\033[1;32;49m[RQ]\033[0m (%s): %s" % (self.log_date_time_string(), httpCodes[code]))
+                print("\033[1;32;49m[RQ]\033[0m (%s): GET %s, %s (%s)" % (
+                self.log_date_time_string(), self.path, code, httpCodes[code]))
 
     def getOS(self):
         platformName = platform.system()
@@ -71,7 +80,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             platName = subprocess.Popen("wmic os get name", stdout=subprocess.PIPE, shell=True)
             winOS = platName.stdout.readlines()[1]
             winOS = winOS.split("|")
-            #platformName = "Windows %s" % platform.win32_ver()[0]
+            # platformName = "Windows %s" % platform.win32_ver()[0]
             return winOS[0]
         elif platformName == "Linux":
             return "%s Linux (%s)" % (platform.linux_distribution()[0].capitalize(), platform.release())
@@ -84,13 +93,13 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             statsDB = anydbm.open("%s/ssp_stats.db" % statsDBLocation, "c")
 
             # https://github.com/giampaolo/psutil
-            mem = (psutil.virtual_memory()[0]/1024)/1024
+            mem = (psutil.virtual_memory()[0] / 1024) / 1024
             cpu = psutil.cpu_times_percent(interval=1, percpu=False)
             cpuUser = cpu[0]
             cpuSystem = cpu[2]
             cpuIdle = cpu[3]
-            disk = psutil.disk_usage(psutil.disk_partitions()[0][1]) # This only gets the first partition for now.
-            diskTotal = ((disk[0]/1024)/1024)/1024
+            disk = psutil.disk_usage(psutil.disk_partitions()[0][1])  # This only gets the first partition for now.
+            diskTotal = ((disk[0] / 1024) / 1024) / 1024
             nic = self.config.get("setup", "nix_interface")
             nicInfo = psutil.net_io_counters(pernic=True)[nic]
             requestCount = str(statsDB["requests"])
@@ -117,9 +126,11 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                 <h3>Log</h3>
                 <!-- http://stackoverflow.com/a/9707445 -->
                 <div style="overflow-y: scroll; height:300px;">%s</div>"""
-                % (self.getOS(), str(mem), cpuUser, cpuSystem, cpuIdle, diskTotal, str(nicInfo[0]), str(nicInfo[1]), str(nicInfo[2]), str(nicInfo[3]), requestCount, logContents))
+                             % (self.getOS(), str(mem), cpuUser, cpuSystem, cpuIdle, diskTotal, str(nicInfo[0]),
+                                str(nicInfo[1]), str(nicInfo[2]), str(nicInfo[3]), requestCount, logContents))
         except ImportError:
-            self.wfile.write("<h5>psutil module not installed. Please install this first before attempting to see system info.")
+            self.wfile.write(
+                "<h5>psutil module not installed. Please install this first before attempting to see system info.")
 
     def do_AUTHHEAD(self):
         # Load the configuration file.
@@ -128,20 +139,22 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         statsDBLocation = self.config.get("stats", "location")
         statsDB = anydbm.open("%s/ssp_stats.db" % statsDBLocation, "c")
 
-        auth_key = self.config.get("auth", "auth_key")
+        #auth_key = self.config.get("auth", "auth_key")
+
+        auth_msg = self.config.get("auth", "auth_box_message")
 
         self.send_response(401)
-        self.send_header("WWW-Authenticate", "Basic %s" % auth_key)
 
-        # Set the content to html.
+        #self.send_header("WWW-Authenticate", "Basic %s" % auth_key)
+        self.send_header("WWW-Authenticate", "Basic realm=\"%s\"" % auth_msg)
         self.send_header("Content-type", "text/html")
 
         # http://b.leppoc.net/2010/02/12/simple-webserver-in-python/
         headers = self.headers.getheader("User-Agent")
-        #print(libuasparser.browser_search(headers))
+        # print(libuasparser.browser_search(headers))
         # http://shon.github.io/httpagentparser/
         simpleheaders = httpagentparser.simple_detect(headers)
-        #print(simpleheaders)
+        # print(simpleheaders)
 
         osHeader = str(simpleheaders[0].replace(" ", "_"))
         browserHeader = str(simpleheaders[1].replace(" ", "_"))
@@ -163,11 +176,14 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             if PLAT == "win32":
                 cInfo = "	[CL] %s, %s" % (osHeader.replace("_", " "), browserHeader.replace("_", " "))
             else:
-                cInfo = "	\033[0;36;49m[CL]\033[0m %s, %s" % (osHeader.replace("_", " "), browserHeader.replace("_", " "))
+                cInfo = "	\033[0;36;49m[CL]\033[0m %s, %s" % (
+                osHeader.replace("_", " "), browserHeader.replace("_", " "))
             print(cInfo)
             logging.info("	[CL] %s, %s" % (osHeader.replace("_", " "), browserHeader.replace("_", " ")))
+
         # End the headers.
         self.end_headers()
+        #self.writeGET()
 
     # https://wiki.python.org/moin/BaseHttpServer
     def do_HEAD(self):
@@ -180,14 +196,14 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         self.send_response(200)
 
         # Set the content to html.
-        self.send_header("Content-type", "text/html")
+        self.send_header("Content-type", "text/html; charset=utf-8")
 
         # http://b.leppoc.net/2010/02/12/simple-webserver-in-python/
         headers = self.headers.getheader("User-Agent")
-        #print(libuasparser.browser_search(headers))
+        # print(libuasparser.browser_search(headers))
         # http://shon.github.io/httpagentparser/
         simpleheaders = httpagentparser.simple_detect(headers)
-        #print(simpleheaders)
+        # print(simpleheaders)
 
         osHeader = str(simpleheaders[0].replace(" ", "_"))
         browserHeader = str(simpleheaders[1].replace(" ", "_"))
@@ -209,11 +225,13 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             if PLAT == "win32":
                 cInfo = "	[CL] %s, %s" % (osHeader.replace("_", " "), browserHeader.replace("_", " "))
             else:
-                cInfo = "	\033[0;36;49m[CL]\033[0m %s, %s" % (osHeader.replace("_", " "), browserHeader.replace("_", " "))
+                cInfo = "	\033[0;36;49m[CL]\033[0m %s, %s" % (
+                osHeader.replace("_", " "), browserHeader.replace("_", " "))
             print(cInfo)
             logging.info("	[CL] %s, %s" % (osHeader.replace("_", " "), browserHeader.replace("_", " ")))
         # End the headers.
         self.end_headers()
+        #self.writeGET()
 
     # https://wiki.python.org/moin/BaseHttpServer
     def do_GET(self):
@@ -223,25 +241,28 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
         # https://gist.github.com/fxsjy/5465353
         if auth_enabled == "True":
-            if self.headers.getheader("Authorization") == None:
+            if self.headers.getheader("Authorization") is None:
                 self.do_AUTHHEAD()
-                #self.wfile.write("Password not accepted.")
+                # self.wfile.write("Password not accepted.")
+                pass
             elif self.headers.getheader("Authorization") == "Basic %s" % auth_key:
                 self.writeGET()
-                print("Password has been accepted.")
+                pass
             else:
                 self.do_AUTHHEAD()
                 print("	\033[0;35;49m[IP]\033[0m Incorrect password entered during authentication.")
-                #print("Not authenticated.") # Mistaken password
+                pass
+                # print("Not authenticated.") # Mistaken password
         else:
             # Create the headers.
             self.do_HEAD()
 
     def writeGET(self):
-
-        # self.send_response(200)
-        # self.send_header("Content-type", "text/html")
-        # self.end_headers()
+        # Necessary for Firefox if auth is set to True. Otherwise, it renders the page as plain text.
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.send_header("Server", "ssp/%s" % SSP_VERSION)
+        self.end_headers()
 
         # Load the configuration file.
         self.config.read("ssp.config")
@@ -302,7 +323,8 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                     f = open("%s/index.html" % docroot_dir, "r")
                     poweredby = self.config.get("content", "poweredby")
                     if poweredby == "true":
-                        self.wfile.write(f.read() + "<p style='font-family: \"Arial\"; font-size: 10pt; text-align: center;'><span>Powered by ssp/%s.</span></p>" % SSP_VERSION)
+                        self.wfile.write(
+                            f.read() + "<p style='font-family: \"Arial\"; font-size: 10pt; text-align: center;'><span>Powered by ssp/%s.</span></p>" % SSP_VERSION)
                     else:
                         self.wfile.write(f.read())
                     f.close()
@@ -319,7 +341,8 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                                 f = open("%sindex.html" % self.path[1:], "r")
                                 poweredby = self.config.get("content", "poweredby")
                                 if poweredby == "true":
-                                    self.wfile.write(f.read() + "<p style='font-family: \"Arial\"; font-size: 10pt; text-align: center;'><span>Powered by ssp/%s.</span></p>" % SSP_VERSION)
+                                    self.wfile.write(
+                                        f.read() + "<p style='font-family: \"Arial\"; font-size: 10pt; text-align: center;'><span>Powered by ssp/%s.</span></p>" % SSP_VERSION)
                                 else:
                                     self.wfile.write(f.read())
                                 f.close()
@@ -331,7 +354,8 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                                 f = open(page404, "r")
                                 poweredby = self.config.get("content", "poweredby")
                                 if poweredby == "true":
-                                    self.wfile.write(f.read() + "<p style='font-family: \"Arial\"; font-size: 10pt; text-align: center;'><span>Powered by ssp/%s.</span></p>" % SSP_VERSION)
+                                    self.wfile.write(
+                                        f.read() + "<p style='font-family: \"Arial\"; font-size: 10pt; text-align: center;'><span>Powered by ssp/%s.</span></p>" % SSP_VERSION)
                                 else:
                                     self.wfile.write(f.read())
                                 f.close()
@@ -346,9 +370,9 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                             self.wfile.write(f.read())
                             f.close()
 
-        #x = open("/Users/vansmith/index.html", "r")
-        #self.wfile.write(x.read())
-        #x.close()
+        # x = open("/Users/vansmith/index.html", "r")
+        # self.wfile.write(x.read())
+        # x.close()
 
         # Open up the stats database.
         statsDBLocation = self.config.get("stats", "location")
@@ -364,12 +388,13 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             year = datetime.datetime.now().year
             month = datetime.datetime.now().month
             day = datetime.datetime.now().day
-            statsDB["requests_%s_%s_%s" % (year, month, day)] = str(int(statsDB["requests_%s_%s_%s" % (year, month, day)]) + 1)
+            statsDB["requests_%s_%s_%s" % (year, month, day)] = str(
+                int(statsDB["requests_%s_%s_%s" % (year, month, day)]) + 1)
         except KeyError:
             statsDB["requests_%s_%s_%s" % (year, month, day)] = "1"
 
-class sspserver():
 
+class sspserver():
     def __init__(self):
         """
             Constructor for main server class.
@@ -399,7 +424,8 @@ class sspserver():
 
         # Setup the logger.
         # http://stackoverflow.com/q/11581794 - formatting help
-        self.logger = logging.basicConfig(filename=LOGFILE, level=logging.DEBUG, format="[%(asctime)s]: %(levelname)s: %(message)s")
+        self.logger = logging.basicConfig(filename=LOGFILE, level=logging.DEBUG,
+                                          format="[%(asctime)s]: %(levelname)s: %(message)s")
 
         # Log that things got started
         logging.info("ssp started.")
@@ -422,11 +448,12 @@ class sspserver():
 
         usehost = self.config.get("setup", "usehostname")
         useNixComplex = self.config.get("setup", "use_nix_ip_workaround")
-        #linuxOutbound = self.config.get("setup", "use_linux_ip_outbond_test")
-        #useFreeBSDComplex = self.config.get("setup", "use_freebsd_ip_workaround")
+        # linuxOutbound = self.config.get("setup", "use_linux_ip_outbond_test")
+        # useFreeBSDComplex = self.config.get("setup", "use_freebsd_ip_workaround")
 
         if platform.system() == "FreeBSD" or PLAT.find("linux") > -1 and useNixComplex == "False":
-            print("It appears that you're running on FreeBSD or Linux and don't have 'use_nix_ip_workaround' set to True. Please make sure to set this to True to and set 'nix_interface' to the interface that you're serving off of.\n\n")
+            print(
+            "It appears that you're running on FreeBSD or Linux and don't have 'use_nix_ip_workaround' set to True. Please make sure to set this to True to and set 'nix_interface' to the interface that you're serving off of.\n\n")
 
         useExternalIP = self.config.get("setup", "useExternalIP")
 
@@ -443,7 +470,8 @@ class sspserver():
                 try:
                     IP = netifaces.ifaddresses(interface)[2][0]["addr"]
                 except ValueError:
-                    print("It would appear that the interface that you've set for nix_interface is incorrect. Please double check and try launching ssp again.")
+                    print(
+                    "It would appear that the interface that you've set for nix_interface is incorrect. Please double check and try launching ssp again.")
             else:
                 try:
 
@@ -481,7 +509,8 @@ class sspserver():
                 if PLAT == "win32":
                     print("ssp/%s\n[Host]    http://%s:%s\n[WebRoot] %s" % (SSP_VERSION, str(IP), str(PORT), DOCROOT))
                 else:
-                    print("ssp/%s\n\033[0;33;49m[Host]\033[0m    http://%s:%s\n\033[0;33;49m[WebRoot]\033[0m %s" % (SSP_VERSION, str(IP), str(PORT), DOCROOT))
+                    print("ssp/%s\n\033[0;33;49m[Host]\033[0m    http://%s:%s\n\033[0;33;49m[WebRoot]\033[0m %s" % (
+                    SSP_VERSION, str(IP), str(PORT), DOCROOT))
 
                 print("\nLog:")
 
@@ -511,6 +540,7 @@ class sspserver():
             logging.info(runTime)
             # If Control-C is pressed, kill the server.
             sys.exit(0)
+
 
 if __name__ == "__main__":
     s = sspserver()
