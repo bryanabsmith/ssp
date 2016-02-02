@@ -84,6 +84,10 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             return winOS[0]
         elif platformName == "Linux":
             return "%s Linux (%s)" % (platform.linux_distribution()[0].capitalize(), platform.release())
+        elif platformName == "FreeBSD":
+            return "%s (%s)" % (platformName, platform.release())
+        else:
+            return platformName
 
     def showServerStatus(self):
         try:
@@ -274,7 +278,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
         docroot_dir = self.config.get("content", "docroot")
 
-        platformName = self.getOS()
+        platformName = str(self.getOS())
 
         # Log that headers were sent
         logging.info("headers")
@@ -454,6 +458,8 @@ class sspserver():
         #if platform.system() == "FreeBSD" or PLAT.find("linux") > -1 and useNixComplex == "False":
             #print("It appears that you're running on FreeBSD or Linux and don't have 'use_nix_ip_workaround' set to True. Please make sure to set this to True to and set 'nix_interface' to the interface that you're serving off of.\n\n")
 
+        IP = "0.0.0.0"
+
         useExternalIP = self.config.get("setup", "useExternalIP")
 
         if useExternalIP == "True":
@@ -469,11 +475,9 @@ class sspserver():
                 try:
                     IP = netifaces.ifaddresses(interface)[2][0]["addr"]
                 except ValueError:
-                    print(
-                    "It would appear that the interface that you've set for nix_interface is incorrect. Please double check and try launching ssp again.")
+                    print("It would appear that the interface that you've set for nix_interface is incorrect. Please double check and try launching ssp again.")
             else:
                 try:
-
                     # Thank to http://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib for the IP tips.
                     if usehost == "False":
                         IP = socket.gethostbyname(socket.getfqdn())
