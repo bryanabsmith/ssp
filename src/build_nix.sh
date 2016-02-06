@@ -13,4 +13,3 @@ cp -R webroot/ dist/webroot/
 echo "\033[0;33;49mCleaning up build files...\033[0m"
 rm -rf build/
 mv dist/ ssp_dist/
-mv ssp_dist/dist/ssp ssp_dist/
