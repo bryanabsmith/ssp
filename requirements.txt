@@ -1,3 +1,4 @@
 requests
 netifaces
 psutil
+httpagentparser
