@@ -20,6 +20,14 @@ A simple test of spp is to use cURL to send a GET request:
 
 ```curl --silent localhost:8888 > /dev/null```
 
+## Linting
+I'm currently focusing on linting the code and aiming for a score > 9 for each of the three scripts. Here are the current scores:
+
+ssp: 9.00
+ssp_stats: 9.20
+ssp_auth_gen: 10.00
+
+NOTE: As I work through linting the code, it's possible that parts of the code will break so don't be surprised if things go wrong.
 
 ## Licences
 
