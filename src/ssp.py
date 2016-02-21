@@ -20,7 +20,8 @@ import sys
 import time
 
 import netifaces
-import httpagentparser
+# pylint: disable=import-error
+import httpagentparser # I'm not sure why PyLint is claiming that this is unused.
 
 __port__ = 8888
 __ssp_version__ = "0.1"
@@ -50,7 +51,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     # ConfigParser for the Handler class
     config = ConfigParser.SafeConfigParser(allow_no_value=True)
 
-    def log_message(self, format, *args):
+    def log_message(self, *args):
         __detailed__ = self.config.get("setup", "detailed")
 
         # The codes are stored in the second argument of the args array that includes
@@ -121,7 +122,8 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                 print("\033[1;32;49m[RQ]\033[0m (%s): GET %s, %s (%s)" % (
                     self.log_date_time_string(), self.path, code, http_codes[code]))
 
-    def get_os(self):
+    @staticmethod
+    def get_os():
         """
             Returns the operating system that ssp is running on.
         """
@@ -517,7 +519,7 @@ class SSPServer(object):
 
         # OS X config location
         # These are all the same for now (planning for platform specific paths).
-        if __plat__ == "darwin":
+        '''if __plat__ == "darwin":
             self.config.read("ssp.config")
         # Windows config location
         elif __plat__ == "win32":
@@ -527,28 +529,35 @@ class SSPServer(object):
             self.config.read("ssp.config")
         # Everything else config location
         else:
-            self.config.read("ssp.config")
+            self.config.read("ssp.config")'''
+        self.config.read("ssp.config")
 
         # Set the log file.
         #__logfile__ = self.config.get("setup", "logfile")
 
         # Setup the logger.
         # http://stackoverflow.com/q/11581794 - formatting help
-        self.logger = logging.basicConfig(filename=self.config.get("setup", "logfile"),
-                                          level=logging.DEBUG,
-                                          format="[%(asctime)s]: %(levelname)s: %(message)s")
+        logging.basicConfig(filename=self.config.get("setup", "logfile"),
+                            level=logging.DEBUG,
+                            format="[%(asctime)s]: %(levelname)s: %(message)s")
 
         # Log that things got started
         logging.info("ssp started.")
 
+        server = {
+            "port": int(self.config.get("setup", "port")),
+            "docroot": self.config.get("content", "docroot"),
+            "ip": "0.0.0.0"
+        }
+
         # Set the port based on the config file.
-        __port__ = int(self.config.get("setup", "port"))
+        #server_port = int(self.config.get("setup", "port"))
 
         # Set the version based on the config file.
         # __ssp_version__ = "ssp/" + self.config.get("setup", "ssp_version")
 
         # Set the docroot based on the config file.
-        __docroot__ = self.config.get("content", "docroot")
+        #server_docroot = self.config.get("content", "docroot")
 
         # Set the location of the "It Works" page (the default index.html page).
         # This is now written into the server itself for the purposes of simplifying things.
@@ -556,7 +565,7 @@ class SSPServer(object):
 
         # Change the working directory to the one specified for the docroot.
         # This ensures that we are serving content out of the docroot directory.
-        # os.chdir(__docroot__)
+        # os.chdir(server["docroot"])
 
         use = {
             "host": self.config.get("setup", "usehostname"),
@@ -566,20 +575,22 @@ class SSPServer(object):
         # linuxOutbound = self.config.get("setup", "use_linux_ip_outbond_test")
         # useFreeBSDComplex = self.config.get("setup", "use_freebsd_ip_workaround")
 
-        server_ip = "0.0.0.0"
+        #server_ip = "0.0.0.0"
 
         #use["external_ip"] = self.config.get("setup", "use_external_ip")
 
         if use["external_ip"] == "True":
             # http://myexternalip.com/#python-request
             import requests
-            req = requests.get("http://www.myexternalip.com/raw")
-            server_ip = req.text.strip("\n")
+            server["ip"] = requests.get("http://www.myexternalip.com/raw").text.strip("\n")
+            #server["ip"] = req.text.strip("\n")
         else:
             if use["nix_complex"] == "True":
                 interface = self.config.get("setup", "nix_interface")
                 try:
-                    server_ip = netifaces.ifaddresses(interface)[2][0]["addr"]
+                    # pylint: disable=no-member
+                    server["ip"] = netifaces.ifaddresses(interface)[2][0]["addr"]
+                    # PyLint doesn't like the existence of this method.
                 except ValueError:
                     print("""It would appear that the interface that
                      you've set for nix_interface is incorrect.
@@ -589,11 +600,11 @@ class SSPServer(object):
                     # Thank to http://stackoverflow.com/questions/166506/
                     # finding-local-ip-addresses-using-pythons-stdlib for the ip tips.
                     if use["host"] == "False":
-                        server_ip = socket.gethostbyname(socket.getfqdn())
+                        server["ip"] = socket.gethostbyname(socket.getfqdn())
                     else:
-                        server_ip = socket.gethostbyname(socket.gethostname())
+                        server["ip"] = socket.gethostbyname(socket.gethostname())
                 except socket.gaierror:
-                    server_ip = "ERROR GETTING ip"
+                    server["ip"] = "Error getting IP address"
 
         try:
             # Set up the http handler. This does the "grunt" work.
@@ -605,15 +616,17 @@ class SSPServer(object):
                 # As I understand it, this creates a standard TCP server
                 # and then handles connections to it using the SSPHTTPHandler
                 # class.
-                httpd = SocketServer.TCPServer(("", __port__), handler)
+                httpd = SocketServer.TCPServer(("", server["port"]), handler)
 
                 if __plat__ == "win32":
                     print("ssp/%s\n[Host]    http://%s:%s\n[WebRoot] %s" %
-                          (__ssp_version__, str(server_ip), str(__port__), __docroot__))
+                          (__ssp_version__, str(server["ip"]),
+                           str(server["port"]), server["docroot"]))
                 else:
                     print("ssp/%s\n\033[0;33;49m[Host]\033[0m    http://" \
                           "%s:%s\n\033[0;33;49m[WebRoot]\033[0m %s" %
-                          (__ssp_version__, str(server_ip), str(__port__), __docroot__))
+                          (__ssp_version__, str(server["ip"]),
+                           str(server["port"]), server["docroot"]))
 
                 print("\nLog:")
 
@@ -623,9 +636,9 @@ class SSPServer(object):
             except socket.error:
                 print("Socket in use on this port. Clear the socket and try again.")
                 # http://stackoverflow.com/questions/12397175/how-do-i-close-an-open-port-from-the-terminal-on-the-mac
-                print("	On a Unix system, execute the following:")
-                print("		sudo lsof -i :<__port__ NUMBER>")
-                print("		sudo kill -9 <PID>")
+                #print("	On a Unix system, execute the following:")
+                #print("		sudo lsof -i :<server["port"] NUMBER>")
+                #print("		sudo kill -9 <PID>")
 
         except KeyboardInterrupt:
 
@@ -645,6 +658,19 @@ class SSPServer(object):
             # If Control-C is pressed, kill the server.
             sys.exit(0)
 
+    @staticmethod
+    def get_server_version():
+        """
+            Return server version.
+        """
+        return __ssp_version__
+
+    @staticmethod
+    def get_server_platform():
+        """
+            Return server platform.
+        """
+        return __plat__
 
 if __name__ == "__main__":
     SSP_SERVER = SSPServer()

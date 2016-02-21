@@ -9,8 +9,15 @@ import ConfigParser
 import sys
 import time
 
-class SSPStats(object):
+"""
+    This is the stats module which helps to generate
+    and report back stats about the server.
+"""
 
+class SSPStats(object):
+    """
+        SSPStats module - the "workhorse" module.
+    """
     config = ConfigParser.RawConfigParser(allow_no_value=True)
 
     """
@@ -34,8 +41,12 @@ class SSPStats(object):
 
         #visualize_bars = ""
 
-        date_time = time.strftime("%H-%M-%S_%d-%m-%Y")
-        nice_date_time = time.strftime("%d/%m/%Y, %H:%M:%S")
+        date_time = {
+            "notformatted": time.strftime("%H-%M-%S_%d-%m-%Y"),
+            "formatted": time.strftime("%d/%m/%Y, %H:%M:%S")
+        }
+        #date_time = time.strftime("%H-%M-%S_%d-%m-%Y")
+        #nice_date_time = time.strftime("%d/%m/%Y, %H:%M:%S")
 
         # http://www.tutorialspoint.com/python/python_command_line_arguments.htm
         # if sys.argv[1] == "reset":
@@ -48,49 +59,56 @@ class SSPStats(object):
         # else:
         print ":: Statistics for ssp"
         try:
-            option = sys.argv[1]
-            if option == "export_csv":
+            #option = sys.argv[1]
+            if sys.argv[1] == "export_csv":
                 output = "key, value\n"
                 for keys in sorted(stats_db.keys()):
                     output += "%s, %s\n" % (keys, stats_db[keys])
                 output_csv = open("%s/ssp_csv_%s.csv" %
-                                  (self.config.get("stats", "output_csv"), date_time), "w")
+                                  (self.config.get("stats", "output_csv"),
+                                   date_time["notformatted"]), "w")
                 output_csv.write(output)
                 output_csv.close()
                 print(" :: Statistics exported to %s/ssp_csv_%s.csv" %
-                      (self.config.get("stats", "output_csv"), date_time))
-            elif option == "export_html":
+                      (self.config.get("stats", "output_csv"), date_time["notformatted"]))
+            elif sys.argv[1] == "export_html":
+                totals = {
+                    "browsers": 0,
+                    "oses": 0,
+                    "requests": 0
+                }
                 browsers = []
                 browsers_value = []
-                browsers_total = 0
+                #browsers_total = 0
                 oses = []
                 oses_value = []
-                oses_total = 0
+                #oses_total = 0
                 requests = []
                 requests_value = []
                 #requests_max = 0
-                requests_total = 0
+                #requests_total = 0
 
                 for keys in stats_db.keys():
                     if keys[:7] == "browser":
-                        browsers_total += int(stats_db[keys])
+                        totals["browsers"] += int(stats_db[keys])
                     elif keys[:2] == "os":
-                        oses_total += int(stats_db[keys])
+                        totals["oses"] += int(stats_db[keys])
                     elif keys == "requests":
-                        requests_total = stats_db["requests"]
+                        totals["requests"] = stats_db["requests"]
 
                 for keys in sorted(stats_db.keys()):
                     if keys[:7] == "browser":
                         browsers.append(keys[8:].replace("_", " ") +
                                         " (%s, %s%%)" %
                                         (stats_db[keys],
-                                         str(round((float(stats_db[keys])/browsers_total)*100, 2))))
+                                         str(round((float(
+                                             stats_db[keys])/totals["browsers"])*100, 2))))
                         browsers_value.append(int(stats_db[keys]))
                     elif keys[:2] == "os":
                         oses.append(keys[3:].replace("_", " ") +
                                     " (%s, %s%%)" %
                                     (stats_db[keys],
-                                     str(round((float(stats_db[keys])/oses_total)*100, 2))))
+                                     str(round((float(stats_db[keys])/totals["oses"])*100, 2))))
                         oses_value.append(int(stats_db[keys]))
                     elif keys[:9] == "requests_":
                         requests.append(keys[9:].replace("_", "/"))
@@ -117,8 +135,8 @@ class SSPStats(object):
                         </script>
                       </body>
                     </html>
-                """ % (nice_date_time,
-                       requests_total,
+                """ % (date_time["formatted"],
+                       totals["requests"],
                        browsers,
                        browsers_value,
                        oses,
@@ -128,11 +146,12 @@ class SSPStats(object):
                        int(requests_max))
 
                 f_output = open("%s/ssp_html_%s.html" %
-                                (self.config.get("stats", "output_html"), date_time), "w")
+                                (self.config.get("stats", "output_html"),
+                                 date_time["notformatted"]), "w")
                 f_output.writelines(stats_html)
                 f_output.close()
                 print(" :: Statistics exported to %s/ssp_html_%s.html" %
-                      (self.config.get("stats", "output_html"), date_time))
+                      (self.config.get("stats", "output_html"), date_time["notformatted"]))
             else:
                 print(" :: Invalid option. Possible options:\n     "
                       ":: export_csv - Export the keys and values to a csv file.\n     "
@@ -149,6 +168,22 @@ class SSPStats(object):
                         print " :: %s=%s" % (keys, stats_db[keys])
             except KeyError:
                 print ":: No data."
+
+    @staticmethod
+    def get_server_version():
+        """
+            Return server version.
+        """
+        import ssp
+        return ssp.__ssp_version__
+
+    @staticmethod
+    def get_server_platform():
+        """
+            Return server platform.
+        """
+        import ssp
+        return ssp.__plat__
 
 if __name__ == "__main__":
     SSP_STATS = SSPStats()
