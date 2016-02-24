@@ -1,11 +1,11 @@
 
-ssp.log
+theatre.log
 
 *.db
 
 visualize.html
 
-ssp_html*
+theatre_html*
 *.pyc
 
 .idea/*

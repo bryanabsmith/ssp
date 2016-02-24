@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 """
-    ssp statistics reporter.
+    theatre statistics reporter.
 """
 
 import anydbm
@@ -14,27 +14,27 @@ import time
     and report back stats about the server.
 """
 
-class SSPStats(object):
+class THEATREStats(object):
     """
-        SSPStats module - the "workhorse" module.
+        THEATREStats module - the "workhorse" module.
     """
     config = ConfigParser.RawConfigParser(allow_no_value=True)
 
     """
-        Statistics class for SSP - init.
+        Statistics class for THEATRE - init.
     """
     def __init__(self):
 
-        self.config.read("ssp.config")
+        self.config.read("theatre.config")
 
         stats_db_location = self.config.get("stats", "location")
         try:
-            stats_db = anydbm.open("%s/ssp_stats.db" % stats_db_location, "c")
+            stats_db = anydbm.open("%s/theatre_stats.db" % stats_db_location, "c")
         except IOError:
             print(" :: It would appear as though the [stats] -> " + \
                   "location configuration option is set to a location " + \
                   "that isn't a valid directory. Please set it to a " +
-                  "valid directory and re-execute ssp_stats.")
+                  "valid directory and re-execute theatre_stats.")
             sys.exit(0)
 
         show_daily = self.config.get("stats", "show_daily_requests")
@@ -57,19 +57,19 @@ class SSPStats(object):
                     # del stats_db[key]
                     # print(key)
         # else:
-        print ":: Statistics for ssp"
+        print ":: Statistics for theatre"
         try:
             #option = sys.argv[1]
             if sys.argv[1] == "export_csv":
                 output = "key, value\n"
                 for keys in sorted(stats_db.keys()):
                     output += "%s, %s\n" % (keys, stats_db[keys])
-                output_csv = open("%s/ssp_csv_%s.csv" %
+                output_csv = open("%s/theatre_csv_%s.csv" %
                                   (self.config.get("stats", "output_csv"),
                                    date_time["notformatted"]), "w")
                 output_csv.write(output)
                 output_csv.close()
-                print(" :: Statistics exported to %s/ssp_csv_%s.csv" %
+                print(" :: Statistics exported to %s/theatre_csv_%s.csv" %
                       (self.config.get("stats", "output_csv"), date_time["notformatted"]))
             elif sys.argv[1] == "export_html":
                 totals = {
@@ -124,7 +124,7 @@ class SSPStats(object):
                         <style>body {background-color: #F2F2F0; font-family: 'Raleway', sans-serif; margin: 5%%;}</style>
                       </head>
                       <body>
-                        <h1>ssp Statistics (%s)</h1>
+                        <h1>theatre Statistics (%s)</h1>
                         <h3>Browser</h3><div id='chartBrowser' class='ct-chart ct-perfect-fourth'></div><p></p>
                         <h3>Operating Systems</h3><div id='chartOS' class='ct-chart ct-perfect-fourth'></div><p></p>
                         <h3>Requests (%s total)</h3><div id='chartRequests' class='ct-chart ct-perfect-fourth'></div>
@@ -145,12 +145,12 @@ class SSPStats(object):
                        requests_value,
                        int(requests_max))
 
-                f_output = open("%s/ssp_html_%s.html" %
+                f_output = open("%s/theatre_html_%s.html" %
                                 (self.config.get("stats", "output_html"),
                                  date_time["notformatted"]), "w")
                 f_output.writelines(stats_html)
                 f_output.close()
-                print(" :: Statistics exported to %s/ssp_html_%s.html" %
+                print(" :: Statistics exported to %s/theatre_html_%s.html" %
                       (self.config.get("stats", "output_html"), date_time["notformatted"]))
             else:
                 print(" :: Invalid option. Possible options:\n     "
@@ -174,16 +174,16 @@ class SSPStats(object):
         """
             Return server version.
         """
-        import ssp
-        return ssp.__ssp_version__
+        import theatre
+        return theatre.__theatre_version__
 
     @staticmethod
     def get_server_platform():
         """
             Return server platform.
         """
-        import ssp
-        return ssp.__plat__
+        import theatre
+        return theatre.__plat__
 
 if __name__ == "__main__":
-    SSP_STATS = SSPStats()
+    THEATRE_STATS = THEATREStats()

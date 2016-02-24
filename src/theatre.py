@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-    ssp main script.
+    theatre main script.
 """
 
 from __future__ import print_function
@@ -24,29 +24,29 @@ import netifaces
 import httpagentparser # I'm not sure why PyLint is claiming that this is unused.
 
 __port__ = 8888
-__ssp_version__ = "0.1"
+__theatre_version__ = "0.1"
 __docroot__ = "."
 __itworks__ = "html/index.html"
-__logfile__ = "ssp.log"
+__logfile__ = "theatre.log"
 __ip__ = "0.0.0.0"
 __plat__ = sys.platform
 
 """
     This is the "workhorse" module - the server itself.
     It's made up of two classes:
-        - SSPHTTPHandler - the handler for the server requests itself.
-        - SSPServer - this basically starts the server and then
-            defers to SSPHTTPHandler for everything else.
+        - THEATREHTTPHandler - the handler for the server requests itself.
+        - THEATREServer - this basically starts the server and then
+            defers to THEATREHTTPHandler for everything else.
 """
 
 # http://stackoverflow.com/a/25375077
-class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
+class THEATREHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     """
         The handler class, handles requests, writing output and authentication.
     """
 
     # Set the server version
-    SimpleHTTPServer.SimpleHTTPRequestHandler.server_version = __ssp_version__
+    SimpleHTTPServer.SimpleHTTPRequestHandler.server_version = __theatre_version__
 
     # ConfigParser for the Handler class
     config = ConfigParser.SafeConfigParser(allow_no_value=True)
@@ -125,7 +125,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     @staticmethod
     def get_os():
         """
-            Returns the operating system that ssp is running on.
+            Returns the operating system that theatre is running on.
         """
         platform_name = platform.system()
         if platform_name == "Darwin":
@@ -153,7 +153,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             import psutil
 
             stats_db_location = self.config.get("stats", "location")
-            stats_db = anydbm.open("%s/ssp_stats.db" % stats_db_location, "c")
+            stats_db = anydbm.open("%s/theatre_stats.db" % stats_db_location, "c")
 
             # https://github.com/giampaolo/psutil
             mem = (psutil.virtual_memory()[0] / 1024) / 1024
@@ -206,10 +206,10 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             Send authentication headers to end user.
         """
         # Load the configuration file.
-        self.config.read("ssp.config")
+        self.config.read("theatre.config")
 
         stats_db_location = self.config.get("stats", "location")
-        stats_db = anydbm.open("%s/ssp_stats.db" % stats_db_location, "c")
+        stats_db = anydbm.open("%s/theatre_stats.db" % stats_db_location, "c")
 
         #auth_key = self.config.get("auth", "auth_key")
 
@@ -266,10 +266,10 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             Send headers to end user.
         """
         # Load the configuration file.
-        self.config.read("ssp.config")
+        self.config.read("theatre.config")
 
         stats_db_location = self.config.get("stats", "location")
-        stats_db = anydbm.open("%s/ssp_stats.db" % stats_db_location, "c")
+        stats_db = anydbm.open("%s/theatre_stats.db" % stats_db_location, "c")
 
         self.send_response(200)
 
@@ -319,7 +319,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         """
             Check to see if you need to authenticate or not
         """
-        self.config.read("ssp.config")
+        self.config.read("theatre.config")
         auth_enabled = self.config.get("auth", "auth_enabled")
         auth_key = self.config.get("auth", "auth_key")
 
@@ -351,11 +351,11 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         # Otherwise, it renders the page as plain text.
         self.send_response(200)
         self.send_header("Content-type", "text/html")
-        self.send_header("Server", "ssp/%s" % __ssp_version__)
+        self.send_header("Server", "theatre/%s" % __theatre_version__)
         self.end_headers()
 
         # Load the configuration file.
-        self.config.read("ssp.config")
+        self.config.read("theatre.config")
 
         # print(self.address_string())
 
@@ -408,7 +408,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                     try:
                         default_page = open("webroot/default_index.html", "r")
                         page = default_page.read()
-                        page = page.replace("&version&", __ssp_version__)
+                        page = page.replace("&version&", __theatre_version__)
                         page = page.replace("&webroot&", docroot_dir)
                         page = page.replace("&platform&", platform_name)
                         self.wfile.write(page)
@@ -425,7 +425,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                         self.wfile.write(
                             f_index.read() + r"""<p style='font-family: \"Arial\";
                              font-size: 10pt; text-align: center;'>
-                             <span>Powered by ssp/%s.</span></p>""" % __ssp_version__)
+                             <span>Powered by theatre/%s.</span></p>""" % __theatre_version__)
                     else:
                         self.wfile.write(f_index.read())
                     f_index.close()
@@ -445,7 +445,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                                     self.wfile.write(
                                         f_index.read() + r"""<p style='font-family: \"Arial\";
                                          font-size: 10pt; text-align: center;'>
-                                         <span>Powered by ssp/%s.</span></p>""" % __ssp_version__)
+                                         <span>Powered by theatre/%s.</span></p>""" % __theatre_version__)
                                 else:
                                     self.wfile.write(f_index.read())
                                 f_index.close()
@@ -460,7 +460,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                                     self.wfile.write(
                                         f_index.read() + r"""<p style='font-family: \"Arial\";
                                          font-size: 10pt; text-align: center;'>
-                                         <span>Powered by ssp/%s.</span></p>""" % __ssp_version__)
+                                         <span>Powered by theatre/%s.</span></p>""" % __theatre_version__)
                                 else:
                                     self.wfile.write(f_index.read())
                                 f_index.close()
@@ -482,7 +482,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
         # Open up the stats database.
         stats_db_location = self.config.get("stats", "location")
-        stats_db = anydbm.open("%s/ssp_stats.db" % stats_db_location, "c")
+        stats_db = anydbm.open("%s/theatre_stats.db" % stats_db_location, "c")
 
         # Add a value to the total requests
         try:
@@ -503,7 +503,7 @@ class SSPHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             stats_db["requests_%s_%s_%s" % (times["year"], times["month"], times["day"])] = "1"
 
 
-class SSPServer(object):
+class THEATREServer(object):
     """
         The primary class, sets up the server and handler for requests.
     """
@@ -520,17 +520,17 @@ class SSPServer(object):
         # OS X config location
         # These are all the same for now (planning for platform specific paths).
         '''if __plat__ == "darwin":
-            self.config.read("ssp.config")
+            self.config.read("theatre.config")
         # Windows config location
         elif __plat__ == "win32":
-            self.config.read("ssp.config")
+            self.config.read("theatre.config")
         # Linux config location
         elif __plat__.find("linux") > -1:
-            self.config.read("ssp.config")
+            self.config.read("theatre.config")
         # Everything else config location
         else:
-            self.config.read("ssp.config")'''
-        self.config.read("ssp.config")
+            self.config.read("theatre.config")'''
+        self.config.read("theatre.config")
 
         # Set the log file.
         #__logfile__ = self.config.get("setup", "logfile")
@@ -542,7 +542,7 @@ class SSPServer(object):
                             format="[%(asctime)s]: %(levelname)s: %(message)s")
 
         # Log that things got started
-        logging.info("ssp started.")
+        logging.info("theatre started.")
 
         server = {
             "port": int(self.config.get("setup", "port")),
@@ -554,7 +554,7 @@ class SSPServer(object):
         #server_port = int(self.config.get("setup", "port"))
 
         # Set the version based on the config file.
-        # __ssp_version__ = "ssp/" + self.config.get("setup", "ssp_version")
+        # __theatre_version__ = "theatre/" + self.config.get("setup", "theatre_version")
 
         # Set the docroot based on the config file.
         #server_docroot = self.config.get("content", "docroot")
@@ -594,7 +594,7 @@ class SSPServer(object):
                 except ValueError:
                     print("""It would appear that the interface that
                      you've set for nix_interface is incorrect.
-                     Please double check and try launching ssp again.""")
+                     Please double check and try launching theatre again.""")
             else:
                 try:
                     # Thank to http://stackoverflow.com/questions/166506/
@@ -608,24 +608,24 @@ class SSPServer(object):
 
         try:
             # Set up the http handler. This does the "grunt" work.
-            # The more fine grained details are handled in the SSPHTTPHandler class.
-            handler = SSPHTTPHandler
+            # The more fine grained details are handled in the THEATREHTTPHandler class.
+            handler = THEATREHTTPHandler
 
             try:
                 # This creates a tcp server using the Handler.
                 # As I understand it, this creates a standard TCP server
-                # and then handles connections to it using the SSPHTTPHandler
+                # and then handles connections to it using the THEATREHTTPHandler
                 # class.
                 httpd = SocketServer.TCPServer(("", server["port"]), handler)
 
                 if __plat__ == "win32":
-                    print("ssp/%s\n[Host]    http://%s:%s\n[WebRoot] %s" %
-                          (__ssp_version__, str(server["ip"]),
+                    print("theatre/%s\n[Host]    http://%s:%s\n[WebRoot] %s" %
+                          (__theatre_version__, str(server["ip"]),
                            str(server["port"]), server["docroot"]))
                 else:
-                    print("ssp/%s\n\033[0;33;49m[Host]\033[0m    http://" \
+                    print("theatre/%s\n\033[0;33;49m[Host]\033[0m    http://" \
                           "%s:%s\n\033[0;33;49m[WebRoot]\033[0m %s" %
-                          (__ssp_version__, str(server["ip"]),
+                          (__theatre_version__, str(server["ip"]),
                            str(server["port"]), server["docroot"]))
 
                 print("\nLog:")
@@ -651,9 +651,9 @@ class SSPServer(object):
             hours, minutes = divmod(minutes, 60)
             run_time = "Run Time: %d:%02d:%02d" % (hours, minutes, seconds)
             if __plat__ == "win32":
-                print("\rClosing ssp...\n%s" % run_time)
+                print("\rClosing theatre...\n%s" % run_time)
             else:
-                print("\r\033[0;35;49mClosing ssp...\n%s\033[0m" % run_time)
+                print("\r\033[0;35;49mClosing theatre...\n%s\033[0m" % run_time)
             logging.info(run_time)
             # If Control-C is pressed, kill the server.
             sys.exit(0)
@@ -663,7 +663,7 @@ class SSPServer(object):
         """
             Return server version.
         """
-        return __ssp_version__
+        return __theatre_version__
 
     @staticmethod
     def get_server_platform():
@@ -673,4 +673,4 @@ class SSPServer(object):
         return __plat__
 
 if __name__ == "__main__":
-    SSP_SERVER = SSPServer()
+    THEATRE_SERVER = THEATREServer()

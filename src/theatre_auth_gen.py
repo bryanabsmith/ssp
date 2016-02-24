@@ -1,5 +1,5 @@
 """
-    ssp authentication credential generator.
+    theatre authentication credential generator.
 """
 
 import base64
@@ -7,7 +7,7 @@ import getpass
 import sys
 
 
-class SSPAuthGen(object):
+class THEATREAuthGen(object):
     """
         Authentication credential generator.
     """
@@ -33,12 +33,12 @@ class SSPAuthGen(object):
         print "To generate a key, you will need a username and a password."
 
         if self.get_plat() == "win32":
-            print "\n   Your key is %s. Add this to [auth] > auth_key in ssp.config.\n" % \
+            print "\n   Your key is %s. Add this to [auth] > auth_key in theatre.config.\n" % \
                   self.get_b64()
         else:
             print "\n   Your key is \033[0;36;49m%s\033[0m. " \
-                  "Add this to [auth] > auth_key in ssp.config.\n" % self.get_b64()
+                  "Add this to [auth] > auth_key in theatre.config.\n" % self.get_b64()
 
 
 if __name__ == "__main__":
-    SSP_AUTH_GEN = SSPAuthGen()
+    THEATRE_AUTH_GEN = THEATREAuthGen()

@@ -84,7 +84,7 @@
   <body>
   <div style="width: 100%;">
     <div id="leftMainDiv" style="float:left; width: 20%">
-      <span class="topHeading">ssp</span> <span class="midHeading">0.1</span>
+      <span class="topHeading">theatre</span> <span class="midHeading">0.1</span>
       <p class="smallSpacer"></p>
       <span class="midHeading">News</span>
       <p></p>
@@ -95,15 +95,15 @@
       <ol>
         <!-- http://stackoverflow.com/a/12386255 -->
         <li><a href="#installSetup">Installing and Setup</a></li>
-        <li><a href="#configure">Configuring: ssp.config</a></li>
+        <li><a href="#configure">Configuring: theatre.config</a></li>
         <li><a href="#using">Using</a></li>
-        <li><a href="#stats">Statistics: ssp_stats</a></li>
+        <li><a href="#stats">Statistics: theatre_stats</a></li>
       </ol>
 
       <p class="largeSpacer"></p>
       <span class="topHeading" id="installSetup">Installing and Setup</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
       <div>
-        ssp works on Windows, OS X, Linux and FreeBSD.
+        theatre works on Windows, OS X, Linux and FreeBSD.
         <p class="smallSpacer"></p>
         <span class="midHeading">Supported OSes</span>
         <p></p>
@@ -133,29 +133,29 @@
       You can get the most recent code from GitHub. To do so, execute the following:
       <p></p>
       <div class="codeBlock">
-        <span class="codePrompt">$</span>git clone https://github.com/bryanabsmith/ssp.git
+        <span class="codePrompt">$</span>git clone https://github.com/bryanabsmith/theatre.git
       </div>
       <p></p>
-      This will download the ssp source code which can be run as-is - no compilation necessary. This isn't to say that everything is good to go out of the box as you will want to configure ssp before running it (see <a href="#configure">Configuring: ssp.config</a>).
+      This will download the theatre source code which can be run as-is - no compilation necessary. This isn't to say that everything is good to go out of the box as you will want to configure theatre before running it (see <a href="#configure">Configuring: theatre.config</a>).
       <p></p>
-      Once you've got the source, simply change into the directory with the ssp source:
+      Once you've got the source, simply change into the directory with the theatre source:
       <p></p>
       <div class="codeBlock">
-        <span class="codePrompt">$</span>cd ssp/src/
+        <span class="codePrompt">$</span>cd theatre/src/
       </div>
       <p></p>
-      And execute the ssp Python script:
+      And execute the theatre Python script:
       <p></p>
       <div class="codeBlock">
-        <span class="codePrompt">$</span>python ssp.py
+        <span class="codePrompt">$</span>python theatre.py
       </div>
       <p class="largeSpacer"></p>
-      <span class="topHeading" id="configure">Configure: ssp.config</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
+      <span class="topHeading" id="configure">Configure: theatre.config</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
       <p></p>
       <div>
-        Before you jump in, you'll want to edit ssp.config.
+        Before you jump in, you'll want to edit theatre.config.
         <p class="smallSpacer"></p>
-        <span class="midHeading">ssp.config</span>
+        <span class="midHeading">theatre.config</span>
         <br \>
         To best explore the configuration file, let's look at it one section at a time.
         <p></p>
@@ -182,9 +182,9 @@
           <p></p>
           # Where should content be logged.
           <br \>
-          <span class="codePrompt">logfile=ssp.log</span>
+          <span class="codePrompt">logfile=theatre.log</span>
           <p></p>
-          # This controls how ssp reports the IP that pages are served from. There are two options, True or False. If set to True (or anything but False), your local host's IP address is returned. If this is False, a fully qualified domain name is returned. If you're unsure as to what you should use, try setting this to True and if you don't see your local IP, set it to False. On some platforms with different host configurations, this may require some trial and error.
+          # This controls how theatre reports the IP that pages are served from. There are two options, True or False. If set to True (or anything but False), your local host's IP address is returned. If this is False, a fully qualified domain name is returned. If you're unsure as to what you should use, try setting this to True and if you don't see your local IP, set it to False. On some platforms with different host configurations, this may require some trial and error.
           <br \>
           <span class="codePrompt">usehostname=True</span>
           <p></p>
@@ -230,7 +230,7 @@
         <span class="codePrompt">custom404=webroot/404.html</span>
       </div>
       <p></p>
-      The docroot is the key property here - this is where you'll be serving content out of. You can also add a "Powered by ssp" label to the bottom of each page if you so choose. Finally, you can set a custom 404 page if someone requests a page that doesn't exist.
+      The docroot is the key property here - this is where you'll be serving content out of. You can also add a "Powered by theatre" label to the bottom of each page if you so choose. Finally, you can set a custom 404 page if someone requests a page that doesn't exist.
       <p></p>
       <span class="lowHeading">[redirect]</span>
       <p></p>
@@ -279,7 +279,7 @@
         <span class="codePrompt">visual_requests=True</span>-->
       </div>
       <p></p>
-      This section controls the settings for ssp_stats. Much of this is self-explanatory - location and the output_csv and output_html settings control the locations of the stats db and where various types of output ought to be stored. show_daily_requests determines whether or not you see daily activity (which might get overwhelming and/or it might be irrelevant to you).
+      This section controls the settings for theatre_stats. Much of this is self-explanatory - location and the output_csv and output_html settings control the locations of the stats db and where various types of output ought to be stored. show_daily_requests determines whether or not you see daily activity (which might get overwhelming and/or it might be irrelevant to you).
 
       <p></p>
       <span class="lowHeading">[server]</span>
@@ -315,14 +315,14 @@
         <p></p>
         # Password key
         <br \>
-        # NOTE: Generate one of these ssp_auth_gen.
+        # NOTE: Generate one of these theatre_auth_gen.
         <br \>
-        # NOTE: The default is ssp (user) / ssp (pass). This is what is set as the default below.
+        # NOTE: The default is theatre (user) / theatre (pass). This is what is set as the default below.
         <br \>
         <span class="codePrompt">auth_key=c3NwOnNzcA==</span>
       </div>
       <p></p>
-      You can set up some basic authentication here. Simply use ssp_auth_gen to generate a base64 encoded string out of a username and password. <span style="font-style: italic;">Note, because this is simply base64 encoded, decoding it is easy (thus making your username and password visible). Try to restrict access to this file if this is a concern.</span>
+      You can set up some basic authentication here. Simply use theatre_auth_gen to generate a base64 encoded string out of a username and password. <span style="font-style: italic;">Note, because this is simply base64 encoded, decoding it is easy (thus making your username and password visible). Try to restrict access to this file if this is a concern.</span>
       <p></p>
       Note: You can also set up the base64 encoded string using the tool below.
       <p></p>
@@ -339,16 +339,16 @@
       <span class="topHeading" id="using">Using</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
       <p></p>
       <div>
-        Once you've got everything configured, you can start serving content. ssp is a simple Python script so it can be executed like so:
+        Once you've got everything configured, you can start serving content. theatre is a simple Python script so it can be executed like so:
         <p></p>
         <div class="codeBlock">
-          <span class="codePrompt">$</span>python ssp.py
+          <span class="codePrompt">$</span>python theatre.py
         </div>
         <p></p>
         Once you do that, you'll see something similar to the following:
         <p></p>
         <div class="codeBlock">
-          ssp/0.1
+          theatre/0.1
           <br \>
           <span style="color: #8d8b00;">[Host]</span>    http://192.168.2.105:8888
           <br \>
@@ -365,7 +365,7 @@
           <span class="codePrompt">$</span>curl --silent 192.168.2.105:8888 > /dev/null
         </div>
         <p></p>
-        When you execute that, you will see a single request registered in ssp from an unknown browser and OS from the IP of the machine that you make the request from.
+        When you execute that, you will see a single request registered in theatre from an unknown browser and OS from the IP of the machine that you make the request from.
         <p></p>
         When you navigate to that page from a web browser, you'll see the following appear in the log:
         <p></p>
@@ -389,11 +389,11 @@
         <p></p>
         <span class="midHeading">Stopping</span>
         <p></p>
-        To stop ssp, simply press Ctrl-C. When you do this, you'll be told how long your server was running:
+        To stop theatre, simply press Ctrl-C. When you do this, you'll be told how long your server was running:
         <p></p>
         <div class="codeBlock">
             <span style="color: #ae0571;">
-              Closing ssp...
+              Closing theatre...
               <br \>
               Run Time: 0:05:39
             </span>
@@ -403,7 +403,7 @@
         <p></p>
         Here is a "legend" for the differen types of codes you'll see before each line in your log:
         <p></p>
-        <span style="color: #159C04;">[RQ]</span> - Requests made by client to ssp.
+        <span style="color: #159C04;">[RQ]</span> - Requests made by client to theatre.
         <br \>
         <span style="color: #159997;">[CL]</span> - Client information for each request.
         <br \>
@@ -411,19 +411,19 @@
       </div>
 
       <p class="largeSpacer"></p>
-      <span class="topHeading" id="stats">Statistics: ssp_stats</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
+      <span class="topHeading" id="stats">Statistics: theatre_stats</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
       <p></p>
       <div>
-        Built into the functionality of ssp is statistics tracking. As of now, browser, os and request counts are logged. These stats can be accessed by running the ssp_stats.py script:
+        Built into the functionality of theatre is statistics tracking. As of now, browser, os and request counts are logged. These stats can be accessed by running the theatre_stats.py script:
         <p></p>
         <div class="codeBlock">
-          <span class="codePrompt">$</span>python ssp_stats.py
+          <span class="codePrompt">$</span>python theatre_stats.py
         </div>
         <p></p>
         When you run this, you will see something similar to the following:
         <p></p>
         <div class="codeBlock">
-          :: Statistics for ssp
+          :: Statistics for theatre
           <br \>
           &emsp;&emsp;&emsp;:: browser_Chrome_48.0.2564.48=6
           <br \>

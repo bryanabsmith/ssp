@@ -4,10 +4,10 @@
 from cx_Freeze import setup, Executable
 
 executables = [
-    Executable("ssp.py")
+    Executable("theatre.py")
 ]
 
-setup(name="ssp",
+setup(name="theatre",
       version="0.1",
-      description="Simple Server Project web server",
+      description="Simple web server.",
       executables=executables)
