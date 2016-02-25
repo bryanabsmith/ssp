@@ -21,8 +21,10 @@ A simple test of theatre is to use cURL to send a GET request:
 ## Linting
 I'm currently focusing on linting the code and aiming for a score > 9 for each of the three scripts. Here are the current scores:
 
-theatre: 9.00
-theatre_stats: 9.20
+theatre: 9.89
+
+theatre_stats: 9.6
+
 theatre_auth_gen: 10.00
 
 NOTE: As I work through linting the code, it's possible that parts of the code will break so don't be surprised if things go wrong.

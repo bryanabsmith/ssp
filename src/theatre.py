@@ -445,7 +445,8 @@ class THEATREHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                                     self.wfile.write(
                                         f_index.read() + r"""<p style='font-family: \"Arial\";
                                          font-size: 10pt; text-align: center;'>
-                                         <span>Powered by theatre/%s.</span></p>""" % __theatre_version__)
+                                         <span>Powered by theatre/%s.</span></p>""" %
+                                        __theatre_version__)
                                 else:
                                     self.wfile.write(f_index.read())
                                 f_index.close()
@@ -460,7 +461,8 @@ class THEATREHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                                     self.wfile.write(
                                         f_index.read() + r"""<p style='font-family: \"Arial\";
                                          font-size: 10pt; text-align: center;'>
-                                         <span>Powered by theatre/%s.</span></p>""" % __theatre_version__)
+                                         <span>Powered by theatre/%s.</span></p>""" %
+                                        __theatre_version__)
                                 else:
                                     self.wfile.write(f_index.read())
                                 f_index.close()
@@ -507,6 +509,23 @@ class THEATREServer(object):
     """
         The primary class, sets up the server and handler for requests.
     """
+
+    def get_simple_ip(self):
+        '''
+            Returns the IP of the local machine using Python's built in functionality.
+        '''
+        self.config.read("theatre.config")
+        use_host = self.config.get("setup", "usehostname")
+        try:
+            # Thank to http://stackoverflow.com/questions/166506/
+            # finding-local-ip-addresses-using-pythons-stdlib for the ip tips.
+            if use_host == "False":
+                return socket.gethostbyname(socket.getfqdn())
+            else:
+                return socket.gethostbyname(socket.gethostname())
+        except socket.gaierror:
+            return "Error getting IP address"
+
     def __init__(self):
         """
             Constructor for main server class.
@@ -596,7 +615,7 @@ class THEATREServer(object):
                      you've set for nix_interface is incorrect.
                      Please double check and try launching theatre again.""")
             else:
-                try:
+                '''try:
                     # Thank to http://stackoverflow.com/questions/166506/
                     # finding-local-ip-addresses-using-pythons-stdlib for the ip tips.
                     if use["host"] == "False":
@@ -604,7 +623,8 @@ class THEATREServer(object):
                     else:
                         server["ip"] = socket.gethostbyname(socket.gethostname())
                 except socket.gaierror:
-                    server["ip"] = "Error getting IP address"
+                    server["ip"] = "Error getting IP address"'''
+                server["ip"] = self.get_simple_ip()
 
         try:
             # Set up the http handler. This does the "grunt" work.

@@ -27,9 +27,10 @@ class THEATREStats(object):
 
         self.config.read("theatre.config")
 
-        stats_db_location = self.config.get("stats", "location")
+        #stats_db_location = self.config.get("stats", "location")
         try:
-            stats_db = anydbm.open("%s/theatre_stats.db" % stats_db_location, "c")
+            stats_db = anydbm.open("%s/theatre_stats.db" %
+                                   self.config.get("stats", "location"), "c")
         except IOError:
             print(" :: It would appear as though the [stats] -> " + \
                   "location configuration option is set to a location " + \
@@ -37,7 +38,7 @@ class THEATREStats(object):
                   "valid directory and re-execute theatre_stats.")
             sys.exit(0)
 
-        show_daily = self.config.get("stats", "show_daily_requests")
+        #show_daily = self.config.get("stats", "show_daily_requests")
 
         #visualize_bars = ""
 
@@ -113,7 +114,7 @@ class THEATREStats(object):
                     elif keys[:9] == "requests_":
                         requests.append(keys[9:].replace("_", "/"))
                         requests_value.append(int(stats_db[keys]))
-                requests_max = max(requests_value) + 2
+                #requests_max = max(requests_value) + 2
 
                 stats_html = """
                     <html>
@@ -143,7 +144,7 @@ class THEATREStats(object):
                        oses_value,
                        requests,
                        requests_value,
-                       int(requests_max))
+                       int(max(requests_value) + 2))
 
                 f_output = open("%s/theatre_html_%s.html" %
                                 (self.config.get("stats", "output_html"),
@@ -159,7 +160,7 @@ class THEATREStats(object):
         except IndexError:
             try:
                 for keys in sorted(stats_db.keys()):
-                    if show_daily == "False":
+                    if self.config.get("stats", "show_daily_requests") == "False":
                         if keys[:8] == "requests":
                             pass
                         else:
