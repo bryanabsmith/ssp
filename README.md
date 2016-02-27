@@ -23,7 +23,7 @@ I'm currently focusing on linting the code and aiming for a score > 9 for each o
 
 theatre: 9.89
 
-theatre_stats: 9.6
+theatre_stats: 9.70
 
 theatre_auth_gen: 10.00
 

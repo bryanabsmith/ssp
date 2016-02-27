@@ -1,0 +1,16 @@
+#!/bin/sh
+
+. /etc/rc.subr
+
+name="theatre"
+rcvar="theatre_enable"
+start_cmd="${name}_start"
+stop_cmd=":"
+
+theatre_start() {
+  cd /opt/theatre/src/
+  /usr/bin/python theatre.py
+}
+
+load_rc_config $nice
+run_rc_command "$1"

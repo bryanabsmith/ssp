@@ -84,11 +84,23 @@
   <body>
   <div style="width: 100%;">
     <div id="leftMainDiv" style="float:left; width: 20%">
-      <span class="topHeading">theatre</span> <span class="midHeading">0.1</span>
+      <div class="ui card">
+        <div class="image">
+          <img src="img/theatre_icon.png">
+        </div>
+        <div class="content">
+          <a class="header">Theatre</a>
+          <div class="meta">
+            <span class="date">0.1</span>
+          </div>
+        </div>
+
+      </div>
+      <!--<span class="topHeading">theatre</span> <span class="midHeading">0.1</span>
       <p class="smallSpacer"></p>
       <span class="midHeading">News</span>
       <p></p>
-      16/01/2016 - <span class="lowHeading">First release</span>
+      16/01/2016 - <span class="lowHeading">First release</span>-->
     </div>
     <div style="float:left; padding-left: 25%; width: 75%;">
       <span class="topHeading" style="margin-top: 30%;" id="toc">Table of Contents</span>
@@ -319,7 +331,7 @@
         <br \>
         # NOTE: The default is theatre (user) / theatre (pass). This is what is set as the default below.
         <br \>
-        <span class="codePrompt">auth_key=c3NwOnNzcA==</span>
+        <span class="codePrompt">auth_key=dGhlYXRyZTp0aGVhdHJl</span>
       </div>
       <p></p>
       You can set up some basic authentication here. Simply use theatre_auth_gen to generate a base64 encoded string out of a username and password. <span style="font-style: italic;">Note, because this is simply base64 encoded, decoding it is easy (thus making your username and password visible). Try to restrict access to this file if this is a concern.</span>

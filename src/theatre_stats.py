@@ -46,19 +46,6 @@ class THEATREStats(object):
             "notformatted": time.strftime("%H-%M-%S_%d-%m-%Y"),
             "formatted": time.strftime("%d/%m/%Y, %H:%M:%S")
         }
-        #date_time = time.strftime("%H-%M-%S_%d-%m-%Y")
-        #nice_date_time = time.strftime("%d/%m/%Y, %H:%M:%S")
-
-        # http://www.tutorialspoint.com/python/python_command_line_arguments.htm
-        # if sys.argv[1] == "reset":
-            # opt = raw_input(":: Are you sure that you want to reset the statistics (y/n)? ")
-            # if opt == "y" or opt == "yes":
-                # http://stackoverflow.com/a/16649789
-                # for key, v in stats_db.iteritems():
-                    # del stats_db[key]
-                    # print(key)
-        # else:
-        print ":: Statistics for theatre"
         try:
             #option = sys.argv[1]
             if sys.argv[1] == "export_csv":
@@ -67,8 +54,8 @@ class THEATREStats(object):
                     output += "%s, %s\n" % (keys, stats_db[keys])
                 output_csv = open("%s/theatre_csv_%s.csv" %
                                   (self.config.get("stats", "output_csv"),
-                                   date_time["notformatted"]), "w")
-                output_csv.write(output)
+                                   date_time["notformatted"]), "w").write(output)
+                #output_csv.write(output)
                 output_csv.close()
                 print(" :: Statistics exported to %s/theatre_csv_%s.csv" %
                       (self.config.get("stats", "output_csv"), date_time["notformatted"]))
@@ -78,16 +65,14 @@ class THEATREStats(object):
                     "oses": 0,
                     "requests": 0
                 }
-                browsers = []
-                browsers_value = []
-                #browsers_total = 0
-                oses = []
-                oses_value = []
-                #oses_total = 0
-                requests = []
-                requests_value = []
-                #requests_max = 0
-                #requests_total = 0
+                counts = {
+                    "browsers": [],
+                    "browsers_value": [],
+                    "oses": [],
+                    "oses_value": [],
+                    "requests": [],
+                    "requests_value": []
+                }
 
                 for keys in stats_db.keys():
                     if keys[:7] == "browser":
@@ -99,21 +84,23 @@ class THEATREStats(object):
 
                 for keys in sorted(stats_db.keys()):
                     if keys[:7] == "browser":
-                        browsers.append(keys[8:].replace("_", " ") +
-                                        " (%s, %s%%)" %
-                                        (stats_db[keys],
-                                         str(round((float(
-                                             stats_db[keys])/totals["browsers"])*100, 2))))
-                        browsers_value.append(int(stats_db[keys]))
+                        counts["browsers"].append(keys[8:].replace("_", " ") +
+                                                  " (%s, %s%%)" %
+                                                  (stats_db[keys],
+                                                   str(round((float(
+                                                       stats_db[keys])/totals["browsers"])
+                                                             *100, 2))))
+                        counts["browsers_value"].append(int(stats_db[keys]))
                     elif keys[:2] == "os":
-                        oses.append(keys[3:].replace("_", " ") +
-                                    " (%s, %s%%)" %
-                                    (stats_db[keys],
-                                     str(round((float(stats_db[keys])/totals["oses"])*100, 2))))
-                        oses_value.append(int(stats_db[keys]))
+                        counts["oses"].append(keys[3:].replace("_", " ") +
+                                              " (%s, %s%%)" %
+                                              (stats_db[keys],
+                                               str(round((float(stats_db[keys])/totals["oses"])
+                                                         *100, 2))))
+                        counts["oses_value"].append(int(stats_db[keys]))
                     elif keys[:9] == "requests_":
-                        requests.append(keys[9:].replace("_", "/"))
-                        requests_value.append(int(stats_db[keys]))
+                        counts["requests"].append(keys[9:].replace("_", "/"))
+                        counts["requests_value"].append(int(stats_db[keys]))
                 #requests_max = max(requests_value) + 2
 
                 stats_html = """
@@ -138,18 +125,18 @@ class THEATREStats(object):
                     </html>
                 """ % (date_time["formatted"],
                        totals["requests"],
-                       browsers,
-                       browsers_value,
-                       oses,
-                       oses_value,
-                       requests,
-                       requests_value,
-                       int(max(requests_value) + 2))
+                       counts["browsers"],
+                       counts["browsers_value"],
+                       counts["oses"],
+                       counts["oses_value"],
+                       counts["requests"],
+                       counts["requests_value"],
+                       int(max(counts["requests_value"]) + 2))
 
                 f_output = open("%s/theatre_html_%s.html" %
                                 (self.config.get("stats", "output_html"),
-                                 date_time["notformatted"]), "w")
-                f_output.writelines(stats_html)
+                                 date_time["notformatted"]), "w").writelines(stats_html)
+                #f_output.writelines(stats_html)
                 f_output.close()
                 print(" :: Statistics exported to %s/theatre_html_%s.html" %
                       (self.config.get("stats", "output_html"), date_time["notformatted"]))
