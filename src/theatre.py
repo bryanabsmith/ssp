@@ -103,24 +103,28 @@ class THEATREHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         # Check to see if the user wants detailed logging.
         if __detailed__ == "True":
             if __plat__ == "win32":
-                print("[RQ] (%s): %s ==> %s" %
-                      (self.log_date_time_string(), self.client_address[0], format % args))
+                print("[RQ] (%s): %s ==> %s (%s)" %
+                      (self.log_date_time_string(), self.client_address[0], args[1], args[2]))
             else:
                 # Print log messages based on the response code.
                 # Each time a request is sent to the server, it responds with a three digit code.
-                print("\033[0;32;49m[RQ]\033[0m (%s): %s ==> %s" % (
-                    self.log_date_time_string(), self.client_address[0], format % args))
-            logging.info("[RQ] (%s): %s ==> %s",
-                         self.log_date_time_string(), self.client_address[0], format % args)
+                print("\033[0;32;49m[RQ]\033[0m (%s): %s ==> %s (%s %s)" %
+                      (self.log_date_time_string(), self.client_address[0], args[1],
+                       args[2], http_codes[args[2]]))
+            logging.info("[RQ] (%s): %s ==> %s (%s %s)",
+                         self.log_date_time_string(), self.client_address[0], args[1],
+                         args[2], http_codes[args[2]])
         else:
             # if code == "200":
             # code = "OK (200)"
             if __plat__ == "win32":
-                print("[RQ] (%s): GET %s, %s (%s)" %
-                      (self.log_date_time_string(), self.path, code, http_codes[code]))
+                print("[RQ] (%s): GET %s, %s ==>" %
+                      (self.log_date_time_string(), self.path, code))
             else:
-                print("\033[1;32;49m[RQ]\033[0m (%s): GET %s, %s (%s)" % (
-                    self.log_date_time_string(), self.path, code, http_codes[code]))
+                print("\033[1;32;49m[RQ]\033[0m (%s): GET %s, %s ==>" %
+                      (self.log_date_time_string(), self.path, code))
+            logging.info("[RQ] (%s): GET %s, %s ==>",
+                         self.log_date_time_string(), self.path, code)
 
     @staticmethod
     def get_os():
@@ -334,9 +338,7 @@ class THEATREHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                 #pass
             else:
                 self.do_authhead()
-                print("""	\033[0;35;49m[
-                ]\033[0m
-                        Incorrect password entered during authentication.""")
+                print("""	\033[0;35;49m[ER]\033[0mIncorrect password.""")
                 #pass
                 # print("Not authenticated.") # Mistaken password
         else:
