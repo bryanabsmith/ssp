@@ -254,7 +254,7 @@ class THEATREHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                 c_info = "	[CL] %s, %s" % \
                         (os_header.replace("_", " "), browser_header.replace("_", " "))
             else:
-                c_info = r"	\033[0;36;49m[CL]\033[0m %s, %s" % (
+                c_info = "	\033[0;36;49m[RQ]\033[0m %s, %s" % (
                     os_header.replace("_", " "), browser_header.replace("_", " "))
             print(c_info)
             logging.info("	[CL] %s, %s", os_header.replace("_", " "),
@@ -309,11 +309,13 @@ class THEATREHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                 c_info = "	[CL] %s, %s" % \
                         (os_header.replace("_", " "), browser_header.replace("_", " "))
             else:
-                c_info = r"	\033[0;36;49m[CL]\033[0m %s, %s" % (
+                c_info = "	\033[0;36;49m[CL]\033[0m %s, %s" % (
                     os_header.replace("_", " "), browser_header.replace("_", " "))
             print(c_info)
             logging.info("	[CL] %s, %s",
                          os_header.replace("_", " "), browser_header.replace("_", " "))
+                         
+        self.write_get()
         # End the headers.
         self.end_headers()
         #self.write_get()
@@ -323,6 +325,7 @@ class THEATREHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         """
             Check to see if you need to authenticate or not
         """
+
         self.config.read("theatre.config")
         auth_enabled = self.config.get("auth", "auth_enabled")
         auth_key = self.config.get("auth", "auth_key")
@@ -344,6 +347,7 @@ class THEATREHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         else:
             # Create the headers.
             self.do_head()
+            #self.write_get()
 
     def write_get(self):
         """
@@ -388,7 +392,7 @@ class THEATREHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                              str(redirect_info["timeout"]))
             time.sleep(redirect_info["timeout"])
             # https://css-tricks.com/redirect-web-page/
-            self.wfile.write(r"<meta http-equiv=\"refresh\" content=\"0; URL='%s'\" />" %
+            self.wfile.write("<meta http-equiv=\"refresh\" content=\"0; URL='%s'\" />" %
                              redirect_info["url"])
         elif self.path[:8] == "/sysinfo":
             if status_info["enabled"] == "True":
@@ -613,9 +617,9 @@ class THEATREServer(object):
                     server["ip"] = netifaces.ifaddresses(interface)[2][0]["addr"]
                     # PyLint doesn't like the existence of this method.
                 except ValueError:
-                    print("""It would appear that the interface that
-                     you've set for nix_interface is incorrect.
-                     Please double check and try launching theatre again.""")
+                    print("It would appear that the interface that" +
+                          "you've set for nix_interface is incorrect." +
+                          "Please double check and try launching theatre again.")
             else:
                 '''try:
                     # Thank to http://stackoverflow.com/questions/166506/

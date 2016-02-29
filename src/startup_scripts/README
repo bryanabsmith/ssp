@@ -1,35 +1,35 @@
 systemd (Linux)
 
-To start ssp at boot on a Linux system with systemd, do the following:
+To start theatre at boot on a Linux system with systemd, do the following:
 
-1. Open up systemd/ssp.sh and edit it if need be with appropriate directories.
-2. Copy systemd/ssp.sh somewhere.
-3. Open up systemd/ssp.service and edit ExecStart if need be (as per where you put systemd/ssp.sh on your machine).
-4. Make ssp.sh executable (chmod +x <location of ssp.sh).
+1. Open up systemd/theatre.sh and edit it if need be with appropriate directories.
+2. Copy systemd/theatre.sh somewhere.
+3. Open up systemd/theatre.service and edit ExecStart if need be (as per where you put systemd/theatre.sh on your machine).
+4. Make theatre.sh executable (chmod +x <location of theatre.sh).
 5. Test everything by executing the following:
   a. systemctl daemon-reload
-  b. systemctl start ssp
-  c. systemctl status ssp
-6. If 5(c) reports back that everything is good (Active: active (running) in green), enable ssp to run at boot: systemctl enable ssp.
+  b. systemctl start theatre
+  c. systemctl status theatre
+6. If 5(c) reports back that everything is good (Active: active (running) in green), enable theatre to run at boot: systemctl enable theatre.
 
 
 rc.d (FreeBSD)
 
-To start ssp at boot on a FreeBSD system, do the following:
+To start theatre at boot on a FreeBSD system, do the following:
 
-1. Copy freebsd/ssp to /etc/rc.d/
-2. Edit /etc/rc.d/ssp to accommodate your configuration.
-3. Add ssp_enable="YES" to /etc/rc.conf.
+1. Copy freebsd/theatre to /etc/rc.d/
+2. Edit /etc/rc.d/theatre to accommodate your configuration.
+3. Add theatre_enable="YES" to /etc/rc.conf.
 
 NOTE: This (3) will block the boot process. I don't know enough about FreeBSD at this point to fix this.
 
 
 Windows
 
-To start ssp at boot on a FreeBSD system, do the following:
+To start theatre at boot on a FreeBSD system, do the following:
 
-1. Copy start_ssp.bat to "C:\Users\{<your username>}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\" (replace {your_username} with your username).
-2. Edit start_ssp.bat as necessary, changing (if need be) the directory to start_ssp.ps1.
+1. Copy start_theatre.bat to "C:\Users\{<your username>}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\" (replace {your_username} with your username).
+2. Edit start_theatre.bat as necessary, changing (if need be) the directory to start_theatre.ps1.
 
 This is not the most elegant solution but it works for now.
 
