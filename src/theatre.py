@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-    theatre main script.
+    theatre main script
 """
 
 from __future__ import print_function
