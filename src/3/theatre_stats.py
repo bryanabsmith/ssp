@@ -50,20 +50,22 @@ class THEATREStats(object):
             if sys.argv[1] == "export_csv":
                 output = "key, value\n"
                 for keys in sorted(stats_db.keys()):
-                    output += "%s, %s\n" % (keys, stats_db[keys])
+                    output += "%s, %s\n" % (keys.decode("utf-8"), stats_db[keys].decode("utf-8"))
                 output_csv = open("%s/theatre_csv_%s.csv" %
                                   (self.config.get("stats", "output_csv"),
-                                   date_time["notformatted"]), "w").write(output)
-                #output_csv.write(output)
+                                   date_time["notformatted"]), "w")
+                output_csv.write(output)
                 output_csv.close()
                 print((" :: Statistics exported to %s/theatre_csv_%s.csv" %
                       (self.config.get("stats", "output_csv"), date_time["notformatted"])))
             elif sys.argv[1] == "export_html":
+                
                 totals = {
                     "browsers": 0,
                     "oses": 0,
                     "requests": 0
                 }
+
                 counts = {
                     "browsers": [],
                     "browsers_value": [],
@@ -74,34 +76,33 @@ class THEATREStats(object):
                 }
 
                 for keys in list(stats_db.keys()):
-                    if keys[:7] == "browser":
+                    if keys[:7].decode("utf-8") == "browser":
                         totals["browsers"] += int(stats_db[keys])
-                    elif keys[:2] == "os":
+                    elif keys[:2].decode("utf-8") == "os":
                         totals["oses"] += int(stats_db[keys])
-                    elif keys == "requests":
+                    elif keys.decode("utf-8") == "requests":
                         totals["requests"] = stats_db["requests"]
 
                 for keys in sorted(stats_db.keys()):
-                    if keys[:7] == "browser":
-                        counts["browsers"].append(keys[8:].replace("_", " ") +
+                    if keys[:7].decode("utf-8") == "browser":
+                        counts["browsers"].append(keys[8:].decode("utf-8").replace("_", " ") +
                                                   " (%s, %s%%)" %
-                                                  (stats_db[keys],
+                                                  (stats_db[keys].decode("utf-8"),
                                                    str(round((float(
                                                        stats_db[keys])/totals["browsers"])
                                                              *100, 2))))
                         counts["browsers_value"].append(int(stats_db[keys]))
-                    elif keys[:2] == "os":
-                        counts["oses"].append(keys[3:].replace("_", " ") +
+                    elif keys[:2].decode("utf-8") == "os":
+                        counts["oses"].append(keys[3:].decode("utf-8").replace("_", " ") +
                                               " (%s, %s%%)" %
-                                              (stats_db[keys],
+                                              (stats_db[keys].decode("utf-8"),
                                                str(round((float(stats_db[keys])/totals["oses"])
                                                          *100, 2))))
                         counts["oses_value"].append(int(stats_db[keys]))
-                    elif keys[:9] == "requests_":
-                        counts["requests"].append(keys[9:].replace("_", "/"))
+                    elif keys[:9].decode("utf-8") == "requests_":
+                        counts["requests"].append(keys[9:].decode("utf-8").replace("_", "/"))
                         counts["requests_value"].append(int(stats_db[keys]))
                 #requests_max = max(requests_value) + 2
-
                 stats_html = """
                     <html>
                       <head>
@@ -123,7 +124,7 @@ class THEATREStats(object):
                       </body>
                     </html>
                 """ % (date_time["formatted"],
-                       totals["requests"],
+                       totals["requests"].decode("utf-8"),
                        counts["browsers"],
                        counts["browsers_value"],
                        counts["oses"],
@@ -155,8 +156,8 @@ class THEATREStats(object):
                         print(" :: %s=%s" % (keys.decode("utf-8"), stats_db[keys].decode("utf-8")))
             except KeyError:
                 print(":: No data.")
-        except ValueError:
-            print(":: No data.")
+        #except ValueError:
+            #print(":: No data.")
 
     @staticmethod
     def get_server_version():
