@@ -110,6 +110,7 @@
         <li><a href="#configure">Configuring: theatre.config</a></li>
         <li><a href="#using">Using</a></li>
         <li><a href="#stats">Statistics: theatre_stats</a></li>
+        <li><a href="#startup">Startup Scripts</a></li>
       </ol>
 
       <p class="largeSpacer"></p>
@@ -498,6 +499,147 @@
         The html output looks similar to <a href="visual_html.html">this</a>.
         <p></p>
       </div>
+      <p class="largeSpacer"></p>
+      <span class="topHeading" id="startup">Startup Scripts</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
+      <div>
+        <p></p>
+        theatre includes templates for startup scripts for OS X (launchd), Linux (systemd) and FreeBSD's rc system.
+        <p></p>
+        <span class="midHeading">OS X</span>
+        <p></p>
+        A launchd plist and a shell script to have theatre run at startup are provided in startup_scripts/osx/. To use these, you will have to edit two different files and load the plist.
+        <p></p>
+        First, open up the theatre.sh script:
+        <p></p>
+        <div class="codeBlock">
+          #!/bin/bash
+          <p></p>
+          # Location of the theatre.py script.
+          <br \>
+          <span class="codePrompt">cd ~/.theatre/src/</span>
+          <p></p>
+          # Please change the below if you have Python installed elsewhere.
+          <br \>
+          # NOTE: By default, this uses the Python supplied version. Change to /System/Library/Frameworks/Python.framework/Versions/2.7/bin/python if you use the Apple supplied version.
+          <br \>
+          <span class="codePrompt">/Library/Frameworks/Python.framework/Versions/2.7/bin/python theatre.py</span>
+        </div>
+        <p></p>
+        You will need to change the first highlighted line to point to the path of the theatre.py script. By default, it points to a hidden folder in ~ but you could put it anywhere you feel necessary to do so.
+        <p></p><p></p>
+        You may also need to change the path to the Python binary. By default, the script points to the version of Python that is installed through an installer from the Python Foundation itself. If you want to use the system supplied version, change this to /System/Library/Frameworks/Python.framework/Versions/2.7/bin/python. You will also need to make the script executable:
+        <p></p>
+        <div class="codeBlock"><span class="codePrompt">$</span>chmod +x &lt;path to theatre.sh&gt;</div>
+        <p></p><p></p>
+        The next file you'll need to edit is the com.vansmith.theatre.plist file:
+        <p></p>
+        <div class="codeBlock">
+          &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+          <br \>
+          &lt;!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"&gt;
+          <br \>
+          &lt;plist version="1.0"&gt;
+          <br \>
+              &nbsp;&nbsp;&nbsp;&nbsp;&lt;dict&gt;
+              <br \>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;key&gt;Label&lt;/key&gt;
+                  <br \>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;string&gt;com.vansmith.theatre&lt;/string&gt;
+                  <br \>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;key&gt;ProgramArguments&lt;/key&gt;
+                  <br \>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;array&gt;
+                  <br \>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;string&gt;/bin/sh&lt;/string&gt;
+                      <br \>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!-- http://apple.stackexchange.com/a/84639 --&gt;
+                      <br \>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;string&gt;-c&lt;/string&gt;
+                      <br \>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="codePrompt">&lt;string&gt;"$HOME/.theatre/theatre.sh"&lt;/string&gt;</span>
+                      <br \>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/array&gt;
+                  <br \>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;key&gt;RunAtLoad&lt;/key&gt;
+                  <br \>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;true/&gt;
+                  <br \>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;key&gt;KeepAlive&lt;/key&gt;
+                  <br \>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;true/&gt;
+                  <br \>
+              &nbsp;&nbsp;&nbsp;&nbsp;&lt;/dict&gt;
+              <br \>
+          &lt;/plist&gt;
+        </div>
+      </div>
+      <p></p>
+      The only thing that needs to be changed here is the path to the shell script that you edited earlier. Once that's done, place the plist in ~/Library/LaunchAgents and execute the following:
+      <p></p>
+      <div class="codeBlock">
+        <span class="codePrompt">$</span>launchctl load com.vansmith.theatre.plist</span>
+        <br \>
+        <span class="codePrompt">$</span>launchctl start com.vansmith.theatre.plist</span>
+      </div>
+      <p></p>
+      <p></p>
+      <span class="midHeading">Linux (systemd)</span>
+      <p></p>
+      On Linux machines, systemd is supported. To set it up, you'll need to edit two files. First, you'll need to modify the included shell script:
+      <p></p>
+      <div class="codeBlock">
+        #!/bin/bash
+        <p></p>
+        # Location of the ssp.py script.
+        <br \>
+        <span class="codePrompt">cd ~/.theatre/</span>
+        <p></p>
+        # Please change the below if you have Python installed elsewhere.
+        <br \>
+        <span class="codePrompt">/bin/python theatre.py</span>
+      </div>
+      <br \>
+      You will need to change the first highlighted line to point to the path of the theatre.py script. By default, it points to a hidden folder in ~ but you could put it anywhere you feel necessary to do so.
+      <p></p>
+      You will also need to make the script executable.
+      <p></p>
+      <div class="codeBlock"><span class="codePrompt">$</span>chmod +x &lt;path to theatre.sh&gt;</div>
+      <p></p>
+      You will also need to modify the theatre.service script:
+      <p></p>
+      <div class="codeBlock">
+        [Unit]
+        <br \>
+        Description=theatre
+        <p></p>
+        [Service]
+        <br \>
+        Type=simple
+        <br \>
+        ExecStart=<span class="codePrompt">/usr/bin/theatre.sh</span>
+        <p></p>
+        [Install]
+        <br \>
+        WantedBy=multi-user.target
+      </div>
+      <p></p>
+      Place that file in /lib/systemd/system/ and execute the following:
+      <p></p>
+      <div class="codeBlock">
+        <span class="codePrompt">#</span>systemctl daemon-reload
+        <br \>
+        <span class="codePrompt">#</span>systemctl enable /lib/systemd/system/theatre.service
+        <br \>
+        <span class="codePrompt">#</span>systemctl start theatre
+      </div>
+      <p></p>
+      You can check that everything is working by executing the following:
+      <p></p>
+      <div class="codeBlock">
+        <span class="codePrompt">#</span>systemctl status theatre
+      </div>
+      <p></p>
+      If everything is working as expected, you should see "active (running)" as the "Active" status.
       <div style="clear:both"></div>
     </div>
   </body>

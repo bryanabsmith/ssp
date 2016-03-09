@@ -7,7 +7,9 @@
         <key>ProgramArguments</key>
         <array>
             <string>/bin/sh</string>
-            <string>/usr/bin/theatre.sh</string>
+            <!-- http://apple.stackexchange.com/a/84639 -->
+            <string>-c</string>
+            <string>"$HOME/.theatre/theatre.sh"</string>
         </array>
         <key>RunAtLoad</key>
         <true/>

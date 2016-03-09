@@ -4,8 +4,8 @@
     theatre statistics reporter.
 """
 
-import anydbm
-import ConfigParser
+import dbm
+import configparser
 import sys
 import time
 
@@ -18,7 +18,7 @@ class THEATREStats(object):
     """
         THEATREStats module - the "workhorse" module.
     """
-    config = ConfigParser.RawConfigParser(allow_no_value=True)
+    config = configparser.RawConfigParser(allow_no_value=True)
 
     """
         Statistics class for THEATRE - init.
@@ -29,13 +29,12 @@ class THEATREStats(object):
 
         #stats_db_location = self.config.get("stats", "location")
         try:
-            stats_db = anydbm.open("%s/theatre_stats.db" %
-                                   self.config.get("stats", "location"), "c")
+            stats_db = dbm.open("{}/theatre_stats".format(self.config.get("stats", "location")), "c")
         except IOError:
-            print(" :: It would appear as though the [stats] -> " + \
+            print((" :: It would appear as though the [stats] -> " + \
                   "location configuration option is set to a location " + \
                   "that isn't a valid directory. Please set it to a " +
-                  "valid directory and re-execute theatre_stats.")
+                  "valid directory and re-execute theatre_stats."))
             sys.exit(0)
 
         #show_daily = self.config.get("stats", "show_daily_requests")
@@ -57,8 +56,8 @@ class THEATREStats(object):
                                    date_time["notformatted"]), "w").write(output)
                 #output_csv.write(output)
                 output_csv.close()
-                print(" :: Statistics exported to %s/theatre_csv_%s.csv" %
-                      (self.config.get("stats", "output_csv"), date_time["notformatted"]))
+                print((" :: Statistics exported to %s/theatre_csv_%s.csv" %
+                      (self.config.get("stats", "output_csv"), date_time["notformatted"])))
             elif sys.argv[1] == "export_html":
                 totals = {
                     "browsers": 0,
@@ -74,7 +73,7 @@ class THEATREStats(object):
                     "requests_value": []
                 }
 
-                for keys in stats_db.keys():
+                for keys in list(stats_db.keys()):
                     if keys[:7] == "browser":
                         totals["browsers"] += int(stats_db[keys])
                     elif keys[:2] == "os":
@@ -138,8 +137,8 @@ class THEATREStats(object):
                                  date_time["notformatted"]), "w")
                 f_output.writelines(stats_html)
                 f_output.close()
-                print(" :: Statistics exported to %s/theatre_html_%s.html" %
-                      (self.config.get("stats", "output_html"), date_time["notformatted"]))
+                print((" :: Statistics exported to %s/theatre_html_%s.html" %
+                      (self.config.get("stats", "output_html"), date_time["notformatted"])))
             else:
                 print(" :: Invalid option. Possible options:\n     "
                       ":: export_csv - Export the keys and values to a csv file.\n     "
@@ -151,11 +150,13 @@ class THEATREStats(object):
                         if keys[:8] == "requests":
                             pass
                         else:
-                            print " :: %s=%s" % (keys, stats_db[keys])
+                            print(" :: %s=%s" % (keys.decode("utf-8"), stats_db[keys].decode("utf-8")))
                     else:
-                        print " :: %s=%s" % (keys, stats_db[keys])
+                        print(" :: %s=%s" % (keys.decode("utf-8"), stats_db[keys].decode("utf-8")))
             except KeyError:
-                print ":: No data."
+                print(":: No data.")
+        except ValueError:
+            print(":: No data.")
 
     @staticmethod
     def get_server_version():
