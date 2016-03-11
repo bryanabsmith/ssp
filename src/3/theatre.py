@@ -172,7 +172,7 @@ class THEATREHTTPHandler(http.server.SimpleHTTPRequestHandler):
             disk_total = ((disk[0] / 1024) / 1024) / 1024
             nic = self.config.get("setup", "nix_interface")
             nic_info = psutil.net_io_counters(pernic=True)[nic]
-            request_count = str(stats_db["requests"])
+            request_count = stats_db["requests"].decode()
 
             log = open(__logfile__, "r")
             log_contents = ""
@@ -181,25 +181,35 @@ class THEATREHTTPHandler(http.server.SimpleHTTPRequestHandler):
             log.close()
 
             # http://www.w3.org/TR/WCAG20-TECHS/H76.html - Meta refresh
-            self.wfile.write(r"""
+            writeString = """
                 <meta http-equiv="refresh" content="5"/>
                 <h1>Machine Status</h1>
-                OS: %s<br \>
-                Memory Total: %s MB<br \>
-                CPU: %s%% (User), %s%% (System), %s%% (Idle)<br \>
-                Disk Total: %s GB<br \>
+                OS: {}<br \>
+                Memory Total: {} MB<br \>
+                CPU: {}% (User), {}% (System), {}% (Idle)<br \>
+                Disk Total: {} GB<br \>
                 Network Information:
                 <!-- http://www.sitepoint.com/forums/showthread.php?128125-How-can-I-remove-initial-space-at-top-of-list -->
-                <ul style="margin-top:0;"><li>Bytes Sent: %s</li><li>Bytes Recieved: %s</li><li>Packets Sent: %s</li><li>Packets Recieved: %s</li></ul>
+                <ul style="margin-top:0;"><li>Bytes Sent: {}</li><li>Bytes Recieved: {}</li><li>Packets Sent: {}</li><li>Packets Recieved: {}</li></ul>
                 <h1>Server Status</h1>
-                Total Requests: %s<p></p>
+                Total Requests: {}<p></p>
                 <h3>Log</h3>
                 <!-- http://stackoverflow.com/a/9707445 -->
-                <div style="overflow-y: scroll; height:300px;">%s</div>"""
-                             % (self.get_os(), str(mem), cpu_info["user"],
-                                cpu_info["system"], cpu_info["idle"], disk_total, str(nic_info[0]),
-                                str(nic_info[1]), str(nic_info[2]),
-                                str(nic_info[3]), request_count, log_contents))
+                <div style="overflow-y: scroll; height:300px;">{}</div>""".format(
+                        self.get_os(),
+                        str(mem),
+                        str(cpu_info["user"]),
+                        str(cpu_info["system"]),
+                        str(cpu_info["idle"]),
+                        str(round(disk_total, 2)),
+                        str(nic_info[0]),
+                        str(nic_info[1]),
+                        str(nic_info[2]),
+                        str(nic_info[3]),
+                        request_count,
+                        log_contents)
+            encodedWrite = writeString.encode("utf-8")
+            self.wfile.write(encodedWrite)
         except ImportError:
             self.wfile.write(
                 """<h5>psutil module not installed.
@@ -401,7 +411,7 @@ class THEATREHTTPHandler(http.server.SimpleHTTPRequestHandler):
                     if self.path == "/sysinfo/%s/" % status_info["complex_path"]:
                         self.show_server_status()
                     else:
-                        self.wfile.write("Access denied.")
+                        self.wfile.write(bytes("Access denied.", "utf-8"))
                 else:
                     self.show_server_status()
             else:
