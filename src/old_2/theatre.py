@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 
 """
-    theatre main script.
+    theatre main script
 """
 
+from __future__ import print_function
 
-
-import dbm
-import configparser
+import anydbm
+import ConfigParser
 import datetime
 import logging
 import os
 import platform
-import http.server
-import socketserver
+import SimpleHTTPServer
+import SocketServer
 import socket
 import subprocess
 import sys
@@ -40,16 +40,16 @@ __plat__ = sys.platform
 """
 
 # http://stackoverflow.com/a/25375077
-class THEATREHTTPHandler(http.server.SimpleHTTPRequestHandler):
+class THEATREHTTPHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     """
         The handler class, handles requests, writing output and authentication.
     """
 
     # Set the server version
-    http.server.SimpleHTTPRequestHandler.server_version = __theatre_version__
+    SimpleHTTPServer.SimpleHTTPRequestHandler.server_version = __theatre_version__
 
     # ConfigParser for the Handler class
-    config = configparser.SafeConfigParser(allow_no_value=True)
+    config = ConfigParser.SafeConfigParser(allow_no_value=True)
 
     def log_message(self, *args):
         __detailed__ = self.config.get("setup", "detailed")
@@ -157,7 +157,7 @@ class THEATREHTTPHandler(http.server.SimpleHTTPRequestHandler):
             import psutil
 
             stats_db_location = self.config.get("stats", "location")
-            stats_db = dbm.open("%s/theatre_stats" % stats_db_location, "c")
+            stats_db = anydbm.open("%s/theatre_stats.db" % stats_db_location, "c")
 
             # https://github.com/giampaolo/psutil
             mem = (psutil.virtual_memory()[0] / 1024) / 1024
@@ -172,7 +172,7 @@ class THEATREHTTPHandler(http.server.SimpleHTTPRequestHandler):
             disk_total = ((disk[0] / 1024) / 1024) / 1024
             nic = self.config.get("setup", "nix_interface")
             nic_info = psutil.net_io_counters(pernic=True)[nic]
-            request_count = stats_db["requests"].decode()
+            request_count = str(stats_db["requests"])
 
             log = open(__logfile__, "r")
             log_contents = ""
@@ -181,35 +181,25 @@ class THEATREHTTPHandler(http.server.SimpleHTTPRequestHandler):
             log.close()
 
             # http://www.w3.org/TR/WCAG20-TECHS/H76.html - Meta refresh
-            writeString = """
+            self.wfile.write(r"""
                 <meta http-equiv="refresh" content="5"/>
                 <h1>Machine Status</h1>
-                OS: {}<br \>
-                Memory Total: {} MB<br \>
-                CPU: {}% (User), {}% (System), {}% (Idle)<br \>
-                Disk Total: {} GB<br \>
+                OS: %s<br \>
+                Memory Total: %s MB<br \>
+                CPU: %s%% (User), %s%% (System), %s%% (Idle)<br \>
+                Disk Total: %s GB<br \>
                 Network Information:
                 <!-- http://www.sitepoint.com/forums/showthread.php?128125-How-can-I-remove-initial-space-at-top-of-list -->
-                <ul style="margin-top:0;"><li>Bytes Sent: {}</li><li>Bytes Recieved: {}</li><li>Packets Sent: {}</li><li>Packets Recieved: {}</li></ul>
+                <ul style="margin-top:0;"><li>Bytes Sent: %s</li><li>Bytes Recieved: %s</li><li>Packets Sent: %s</li><li>Packets Recieved: %s</li></ul>
                 <h1>Server Status</h1>
-                Total Requests: {}<p></p>
+                Total Requests: %s<p></p>
                 <h3>Log</h3>
                 <!-- http://stackoverflow.com/a/9707445 -->
-                <div style="overflow-y: scroll; height:300px;">{}</div>""".format(
-                        self.get_os(),
-                        str(mem),
-                        str(cpu_info["user"]),
-                        str(cpu_info["system"]),
-                        str(cpu_info["idle"]),
-                        str(round(disk_total, 2)),
-                        str(nic_info[0]),
-                        str(nic_info[1]),
-                        str(nic_info[2]),
-                        str(nic_info[3]),
-                        request_count,
-                        log_contents)
-            encodedWrite = writeString.encode("utf-8")
-            self.wfile.write(encodedWrite)
+                <div style="overflow-y: scroll; height:300px;">%s</div>"""
+                             % (self.get_os(), str(mem), cpu_info["user"],
+                                cpu_info["system"], cpu_info["idle"], disk_total, str(nic_info[0]),
+                                str(nic_info[1]), str(nic_info[2]),
+                                str(nic_info[3]), request_count, log_contents))
         except ImportError:
             self.wfile.write(
                 """<h5>psutil module not installed.
@@ -223,7 +213,7 @@ class THEATREHTTPHandler(http.server.SimpleHTTPRequestHandler):
         self.config.read("theatre.config")
 
         stats_db_location = self.config.get("stats", "location")
-        stats_db = dbm.open("%s/theatre_stats" % stats_db_location, "c")
+        stats_db = anydbm.open("%s/theatre_stats.db" % stats_db_location, "c")
 
         #auth_key = self.config.get("auth", "auth_key")
 
@@ -236,10 +226,10 @@ class THEATREHTTPHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Content-type", "text/html")
 
         # http://b.leppoc.net/2010/02/12/simple-webserver-in-python/
-        headers = self.headers.get_all("User-Agent")
+        headers = self.headers.getheader("User-Agent")
         # print(libuasparser.browser_search(headers))
         # http://shon.github.io/httpagentparser/
-        simpleheaders = httpagentparser.simple_detect(headers[0])
+        simpleheaders = httpagentparser.simple_detect(headers)
         # print(simpleheaders)
 
         os_header = str(simpleheaders[0].replace(" ", "_"))
@@ -283,7 +273,7 @@ class THEATREHTTPHandler(http.server.SimpleHTTPRequestHandler):
         self.config.read("theatre.config")
 
         stats_db_location = self.config.get("stats", "location")
-        stats_db = dbm.open("%s/theatre_stats" % stats_db_location, "c")
+        stats_db = anydbm.open("%s/theatre_stats.db" % stats_db_location, "c")
 
         self.send_response(200)
 
@@ -291,11 +281,11 @@ class THEATREHTTPHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Content-type", "text/html; charset=utf-8")
 
         # http://b.leppoc.net/2010/02/12/simple-webserver-in-python/
-        headers = self.headers.get_all("User-Agent")
+        headers = self.headers.getheader("User-Agent")
         # print(libuasparser.browser_search(headers))
         # http://shon.github.io/httpagentparser/
-        simpleheaders = httpagentparser.simple_detect(headers[0])
-        #print(simpleheaders)
+        simpleheaders = httpagentparser.simple_detect(headers)
+        # print(simpleheaders)
 
         os_header = str(simpleheaders[0].replace(" ", "_"))
         browser_header = str(simpleheaders[1].replace(" ", "_"))
@@ -339,15 +329,14 @@ class THEATREHTTPHandler(http.server.SimpleHTTPRequestHandler):
         self.config.read("theatre.config")
         auth_enabled = self.config.get("auth", "auth_enabled")
         auth_key = self.config.get("auth", "auth_key")
-        headers = self.headers.get_all("Authorization")
 
         # https://gist.github.com/fxsjy/5465353
         if auth_enabled == "True":
-            if headers is None:
+            if self.headers.getheader("Authorization") is None:
                 self.do_authhead()
                 # self.wfile.write("Password not accepted.")
                 #pass
-            elif headers[0] == "Basic %s" % auth_key:
+            elif self.headers.getheader("Authorization") == "Basic %s" % auth_key:
                 self.write_get()
                 #pass
             else:
@@ -411,7 +400,7 @@ class THEATREHTTPHandler(http.server.SimpleHTTPRequestHandler):
                     if self.path == "/sysinfo/%s/" % status_info["complex_path"]:
                         self.show_server_status()
                     else:
-                        self.wfile.write(bytes("Access denied.", "utf-8"))
+                        self.wfile.write("Access denied.")
                 else:
                     self.show_server_status()
             else:
@@ -436,20 +425,20 @@ class THEATREHTTPHandler(http.server.SimpleHTTPRequestHandler):
                         logging.error("Error: %s (%s)", (err.strerror, self.path), None)
                 # If there is an index.html available, use that.
                 elif os.path.isfile("%s/index.html" % docroot_dir) is True:
-                    f_index = open("%s/index.html" % docroot_dir, "rb")
+                    f_index = open("%s/index.html" % docroot_dir, "r")
                     poweredby = self.config.get("content", "poweredby")
                     if poweredby == "true":
                         self.wfile.write(
-                            f_index.read() + bytes("""<p style='font-family: \"Arial\";
+                            f_index.read() + """<p style='font-family: \"Arial\";
                              font-size: 10pt; text-align: center;'>
-                             <span>Powered by theatre/{}.</span></p>""".format(__theatre_version__), "utf-8"))
+                             <span>Powered by theatre/%s.</span></p>""" % __theatre_version__)
                     else:
                         self.wfile.write(f_index.read())
                     f_index.close()
             else:
                 try:
                     # https://wiki.python.org/moin/BaseHttpServer
-                    f_index = open(bytes("{}".format(docroot_dir + self.path[1:]), "utf-8"), "rb") # https://stackoverflow.com/questions/33054527/python-3-5-typeerror-a-bytes-like-object-is-required-not-str
+                    f_index = open("%s/%s" % (docroot_dir, self.path[1:]), "r")
                     self.wfile.write(f_index.read())
                     f_index.close()
                 except IOError as err:
@@ -501,7 +490,7 @@ class THEATREHTTPHandler(http.server.SimpleHTTPRequestHandler):
 
         # Open up the stats database.
         stats_db_location = self.config.get("stats", "location")
-        stats_db = dbm.open("%s/theatre_stats" % stats_db_location, "c")
+        stats_db = anydbm.open("%s/theatre_stats.db" % stats_db_location, "c")
 
         # Add a value to the total requests
         try:
@@ -551,7 +540,7 @@ class THEATREServer(object):
         start_time = time.time()
 
         # Setup the configuration parser.
-        self.config = configparser.RawConfigParser(allow_no_value=True)
+        self.config = ConfigParser.RawConfigParser(allow_no_value=True)
 
         # OS X config location
         # These are all the same for now (planning for platform specific paths).
@@ -653,7 +642,7 @@ class THEATREServer(object):
                 # As I understand it, this creates a standard TCP server
                 # and then handles connections to it using the THEATREHTTPHandler
                 # class.
-                httpd = socketserver.TCPServer(("", server["port"]), handler)
+                httpd = SocketServer.TCPServer(("", server["port"]), handler)
 
                 if __plat__ == "win32":
                     print("theatre/%s\n[Host]    http://%s:%s\n[WebRoot] %s" %

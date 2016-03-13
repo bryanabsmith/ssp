@@ -111,6 +111,11 @@
         <li><a href="#using">Using</a></li>
         <li><a href="#stats">Statistics: theatre_stats</a></li>
         <li><a href="#startup">Startup Scripts</a></li>
+        <ol>
+          <li><a href="#startup_osx">OS X</a></li>
+          <li><a href="#startup_linux">Linux (systemd)</a></li>
+          <li><a href="#startup_freebsd">FreeBSD</a></li>
+        </ol>
       </ol>
 
       <p class="largeSpacer"></p>
@@ -505,7 +510,7 @@
         <p></p>
         theatre includes templates for startup scripts for OS X (launchd), Linux (systemd) and FreeBSD's rc system.
         <p></p>
-        <span class="midHeading">OS X</span>
+        <span class="midHeading" id="startup_osx">OS X</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
         <p></p>
         A launchd plist and a shell script to have theatre run at startup are provided in startup_scripts/osx/. To use these, you will have to edit two different files and load the plist.
         <p></p>
@@ -583,7 +588,7 @@
       </div>
       <p></p>
       <p></p>
-      <span class="midHeading">Linux (systemd)</span>
+      <span class="midHeading" id="startup_linux">Linux (systemd)</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
       <p></p>
       On Linux machines, systemd is supported. To set it up, you'll need to edit two files. First, you'll need to modify the included shell script:
       <p></p>
@@ -640,7 +645,42 @@
       </div>
       <p></p>
       If everything is working as expected, you should see "active (running)" as the "Active" status.
-      <div style="clear:both"></div>
+      <p></p>
+      <p></p>
+      <span class="midHeading" id="startup_freebsd">FreeBSD (rc.d)</span> <a href="#toc"><i class="fa fa-arrow-up"></i></a>
+      <p></p>
+      FreeBSD is also supported through the rc.d system. First, copy startup_scripts/freebsd/theatre to /etc/rc.d/. Edit the file to accommodate your install:
+      <p></p>
+      <div class="codeBlock">
+        #!/bin/sh
+        <p></p>
+        . /etc/rc.subr
+        <p></p>
+        name="theatre"
+        <br \>
+        rcvar="theatre_enable"
+        <br \>
+        start_cmd="${name}_start"
+        <br \>
+        stop_cmd=":"
+        <p></p>
+        theatre_start() {
+          <br \>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="codePrompt">cd /opt/theatre/src/
+          <br \>
+          &nbsp;&nbsp;&nbsp;&nbsp;/usr/bin/python theatre.py</span>
+          <br \>
+        }
+        <p></p>
+        load_rc_config $nice
+        <br \>
+        run_rc_command "$1"
+      </div>
+      <p></p>
+      Once that has been edited accordingly, add the following to /etc/rc.conf:
+      <p></p>
+      <div class="codeBlock">theatre_enable="YES"</div>
+      <p></p><div style="clear:both"></div>
     </div>
   </body>
 </html>

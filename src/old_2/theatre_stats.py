@@ -4,8 +4,8 @@
     theatre statistics reporter.
 """
 
-import dbm
-import configparser
+import anydbm
+import ConfigParser
 import sys
 import time
 
@@ -18,7 +18,7 @@ class THEATREStats(object):
     """
         THEATREStats module - the "workhorse" module.
     """
-    config = configparser.RawConfigParser(allow_no_value=True)
+    config = ConfigParser.RawConfigParser(allow_no_value=True)
 
     """
         Statistics class for THEATRE - init.
@@ -29,12 +29,13 @@ class THEATREStats(object):
 
         #stats_db_location = self.config.get("stats", "location")
         try:
-            stats_db = dbm.open("{}/theatre_stats".format(self.config.get("stats", "location")), "c")
+            stats_db = anydbm.open("%s/theatre_stats.db" %
+                                   self.config.get("stats", "location"), "c")
         except IOError:
-            print((" :: It would appear as though the [stats] -> " + \
+            print(" :: It would appear as though the [stats] -> " + \
                   "location configuration option is set to a location " + \
                   "that isn't a valid directory. Please set it to a " +
-                  "valid directory and re-execute theatre_stats."))
+                  "valid directory and re-execute theatre_stats.")
             sys.exit(0)
 
         #show_daily = self.config.get("stats", "show_daily_requests")
@@ -50,22 +51,20 @@ class THEATREStats(object):
             if sys.argv[1] == "export_csv":
                 output = "key, value\n"
                 for keys in sorted(stats_db.keys()):
-                    output += "%s, %s\n" % (keys.decode("utf-8"), stats_db[keys].decode("utf-8"))
+                    output += "%s, %s\n" % (keys, stats_db[keys])
                 output_csv = open("%s/theatre_csv_%s.csv" %
                                   (self.config.get("stats", "output_csv"),
-                                   date_time["notformatted"]), "w")
-                output_csv.write(output)
+                                   date_time["notformatted"]), "w").write(output)
+                #output_csv.write(output)
                 output_csv.close()
-                print((" :: Statistics exported to %s/theatre_csv_%s.csv" %
-                      (self.config.get("stats", "output_csv"), date_time["notformatted"])))
+                print(" :: Statistics exported to %s/theatre_csv_%s.csv" %
+                      (self.config.get("stats", "output_csv"), date_time["notformatted"]))
             elif sys.argv[1] == "export_html":
-                
                 totals = {
                     "browsers": 0,
                     "oses": 0,
                     "requests": 0
                 }
-
                 counts = {
                     "browsers": [],
                     "browsers_value": [],
@@ -75,34 +74,35 @@ class THEATREStats(object):
                     "requests_value": []
                 }
 
-                for keys in list(stats_db.keys()):
-                    if keys[:7].decode("utf-8") == "browser":
+                for keys in stats_db.keys():
+                    if keys[:7] == "browser":
                         totals["browsers"] += int(stats_db[keys])
-                    elif keys[:2].decode("utf-8") == "os":
+                    elif keys[:2] == "os":
                         totals["oses"] += int(stats_db[keys])
-                    elif keys.decode("utf-8") == "requests":
+                    elif keys == "requests":
                         totals["requests"] = stats_db["requests"]
 
                 for keys in sorted(stats_db.keys()):
-                    if keys[:7].decode("utf-8") == "browser":
-                        counts["browsers"].append(keys[8:].decode("utf-8").replace("_", " ") +
+                    if keys[:7] == "browser":
+                        counts["browsers"].append(keys[8:].replace("_", " ") +
                                                   " (%s, %s%%)" %
-                                                  (stats_db[keys].decode("utf-8"),
+                                                  (stats_db[keys],
                                                    str(round((float(
                                                        stats_db[keys])/totals["browsers"])
                                                              *100, 2))))
                         counts["browsers_value"].append(int(stats_db[keys]))
-                    elif keys[:2].decode("utf-8") == "os":
-                        counts["oses"].append(keys[3:].decode("utf-8").replace("_", " ") +
+                    elif keys[:2] == "os":
+                        counts["oses"].append(keys[3:].replace("_", " ") +
                                               " (%s, %s%%)" %
-                                              (stats_db[keys].decode("utf-8"),
+                                              (stats_db[keys],
                                                str(round((float(stats_db[keys])/totals["oses"])
                                                          *100, 2))))
                         counts["oses_value"].append(int(stats_db[keys]))
-                    elif keys[:9].decode("utf-8") == "requests_":
-                        counts["requests"].append(keys[9:].decode("utf-8").replace("_", "/"))
+                    elif keys[:9] == "requests_":
+                        counts["requests"].append(keys[9:].replace("_", "/"))
                         counts["requests_value"].append(int(stats_db[keys]))
                 #requests_max = max(requests_value) + 2
+
                 stats_html = """
                     <html>
                       <head>
@@ -124,7 +124,7 @@ class THEATREStats(object):
                       </body>
                     </html>
                 """ % (date_time["formatted"],
-                       totals["requests"].decode("utf-8"),
+                       totals["requests"],
                        counts["browsers"],
                        counts["browsers_value"],
                        counts["oses"],
@@ -138,8 +138,8 @@ class THEATREStats(object):
                                  date_time["notformatted"]), "w")
                 f_output.writelines(stats_html)
                 f_output.close()
-                print((" :: Statistics exported to %s/theatre_html_%s.html" %
-                      (self.config.get("stats", "output_html"), date_time["notformatted"])))
+                print(" :: Statistics exported to %s/theatre_html_%s.html" %
+                      (self.config.get("stats", "output_html"), date_time["notformatted"]))
             else:
                 print(" :: Invalid option. Possible options:\n     "
                       ":: export_csv - Export the keys and values to a csv file.\n     "
@@ -151,13 +151,11 @@ class THEATREStats(object):
                         if keys[:8] == "requests":
                             pass
                         else:
-                            print(" :: %s=%s" % (keys.decode("utf-8"), stats_db[keys].decode("utf-8")))
+                            print " :: %s=%s" % (keys, stats_db[keys])
                     else:
-                        print(" :: %s=%s" % (keys.decode("utf-8"), stats_db[keys].decode("utf-8")))
+                        print " :: %s=%s" % (keys, stats_db[keys])
             except KeyError:
-                print(":: No data.")
-        #except ValueError:
-            #print(":: No data.")
+                print ":: No data."
 
     @staticmethod
     def get_server_version():
