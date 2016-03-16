@@ -428,7 +428,7 @@ class THEATREHTTPHandler(http.server.SimpleHTTPRequestHandler):
                         page = page.replace("&version&", __theatre_version__)
                         page = page.replace("&webroot&", docroot_dir)
                         page = page.replace("&platform&", platform_name)
-                        self.wfile.write(page)
+                        self.wfile.write(page.encode("utf-8"))
                         default_page.close()
                     except IOError as err:
                         print("	=> Error: %s (%s)" % (err.strerror, self.path))
@@ -440,7 +440,7 @@ class THEATREHTTPHandler(http.server.SimpleHTTPRequestHandler):
                     poweredby = self.config.get("content", "poweredby")
                     if poweredby == "true":
                         self.wfile.write(
-                            f_index.read() + bytes("""<p style='font-family: \"Arial\";
+                            f_index.read() + bytes("""<p></p><p style='font-family: \"Arial\";
                              font-size: 10pt; text-align: center;'>
                              <span>Powered by theatre/{}.</span></p>""".format(__theatre_version__), "utf-8"))
                     else:
